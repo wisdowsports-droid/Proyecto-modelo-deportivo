@@ -1,0 +1,4 @@
+# scipy is used for Shin's-method root-finding (market/devig.py).
+# Everything else is standard library on purpose (sqlite3, unittest, math,
+# statistics) so this runs anywhere without a package manager fight.
+scipy>=1.11

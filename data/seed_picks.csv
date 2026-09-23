@@ -1,0 +1,16 @@
+tanda,liga,fecha,partido,pick,mercado,cuota_pick,cuota_1x2,prob_modelo,prob_mercado_implicita,edge,valor_sn,prob_justa_pick,confianza,resultado_real,acierto
+1,Colombia,2026-09-18,Aguilas Doradas vs Deportivo Pereira,Gana Pereira,1X2,9.60,,14.9%,10.0%,+4.9%,Si,,,"Aguilas Doradas 2-2 Pereira",No acerto
+1,Uruguay,2026-09-19,Boston River vs Progreso,Gana Boston River,1X2,1.88,,60.1%,48.7%,+11.4%,Si*,,,"Progreso 2-1 Boston River",No acerto
+1,Colombia,2026-09-19,Millonarios vs Boyaca Chico,Empate,1X2,5.80,,20.5%,16.6%,+4.0%,No (limite),,,"Millonarios 3-0 Boyaca Chico",No acerto
+1,Uruguay,2026-09-19,Cerro vs Penarol,Gana Cerro,1X2,7.30,,15.1%,12.6%,+2.5%,No,,,"Penarol 2-1 Cerro",No acerto
+1,Uruguay,2026-09-19,Deportivo Maldonado vs Cerro Largo,Empate,1X2,3.55,,34.4%,25.8%,+8.6%,Si*,,,"Deportivo Maldonado 2-0 Cerro Largo",No acerto
+1,Colombia,2026-09-19,Deportivo Cali vs Cucuta Deportivo,Gana Cucuta,1X2,7.40,,14.1%,13.0%,+1.1%,No,,,"Deportivo Cali 3-0 Cucuta",No acerto
+1,Uruguay,2026-09-20,Nacional vs Defensor Sporting,Gana Nacional,1X2,1.65,,60.1%,55.6%,+4.5%,Si*,,,"Nacional 3-2 Defensor Sporting",Acerto
+1,Uruguay,2026-09-20,Liverpool vs Racing Montevideo,Gana Liverpool,1X2,2.25,,57.5%,40.8%,+16.7%,Si*,,,"Liverpool 0-0 Racing Montevideo",No acerto
+2,Champions Femenina,2026-09-22,Arsenal vs HB Koge,Over 2.5 goles,Goles,,1.08 / 12.00 / 34.00,,,,,,Alta en resultado / media en goles,"Arsenal 1-0 HB Koge",Fallo
+2,Liga Colombiana,2026-09-22,Santa Fe vs Deportivo Cali,Doble oportunidad 1X (Santa Fe o empate),Doble oportunidad,,2.15 / 3.10 / 3.60,,,,,74%,Media,"(en vivo / pendiente - partido no habia arrancado al momento del corte)",Pendiente
+2,Champions Femenina,2026-09-22,Juventus vs Benfica,Gana Juventus,1X2,,1.70 / 4.20 / 4.50,,,,,56%,Media-alta,"Juventus 1-2 Benfica",Fallo
+2,Liga Colombiana,2026-09-22,Independiente Medellin vs Jaguares de Cordoba,Doble oportunidad 1X (Medellin o empate),Doble oportunidad,,1.26 / 5.50 / 11.50,,,,,92%,"Media (liga poco regular, cautela)","(en vivo al corte: Medellin 2-1 Jaguares, minuto 70 - falta confirmar marcador final)",Pendiente
+2,Champions Femenina,2026-09-22,Real Madrid vs PSG,Doble oportunidad 1X (Real Madrid o empate),Doble oportunidad,,1.83 / 3.90 / 4.00,,,,,76%,Media,"Real Madrid 1-1 PSG",Acerto
+2,Champions Femenina,2026-09-22,Bayern Munich vs Manchester City,Sin pick claro,,,2.10 / 4.00 / 3.20,,,,,,"Baja (primer cruce historico, muy parejo)","Bayern 2-2 Manchester City",Sin pick
+2,Champions Femenina,2026-09-22,Inter vs Hacken,Sin pick claro,,,2.30 / 3.50 / 2.90,,,,,,"Baja (debut europeo de Inter, cuotas casi parejas)","Inter 1-0 Hacken",Sin pick
