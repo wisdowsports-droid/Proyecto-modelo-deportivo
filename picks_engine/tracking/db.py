@@ -1,36 +1,94 @@
-"""SQLite-backed pick tracking. One row per pick, from creation to
-settlement -- this is what replaces narrating results by hand in a doc.
+"""Pick tracking. One row per pick, from creation to settlement -- this is
+what replaces narrating results by hand in a doc.
 
-Deliberately plain sqlite3 (stdlib), no ORM: the schema is small and stable
-enough that an ORM would be more machinery than the problem needs.
+Two backends behind the same PicksDB interface:
+
+- Supabase (Postgres) -- the real database. Pass a ``postgresql://`` URL, or
+  use ``PicksDB.from_env()``, which reads DATABASE_URL (from the environment
+  or a ``.env`` file at the project root). Schema lives in
+  ``supabase/migrations/``.
+- SQLite -- only for tests and offline experiments. Pass a file path or
+  ``":memory:"``. Schema lives in ``schema.sql`` next to this file; keep the
+  two schemas in sync when adding columns.
+
+Plain SQL on both (psycopg / stdlib sqlite3), no ORM: the schema is small and
+stable enough that an ORM would be more machinery than the problem needs.
+Rows come back as plain dicts with dates/timestamps as ISO strings on both
+backends, so callers never need to know which one they're talking to.
 """
 from __future__ import annotations
 
 import datetime
+import os
 import pathlib
 import sqlite3
 
 _SCHEMA_PATH = pathlib.Path(__file__).parent / "schema.sql"
+_PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 VALID_STATUSES = {"pending", "won", "lost", "push", "void", "no_pick"}
+
+_COLUMNS = (
+    "created_at", "sport", "league", "event", "event_date", "market", "selection",
+    "decimal_odds", "devig_method", "model_prob", "fair_market_prob", "edge",
+    "kelly_stake", "status", "legacy_note", "source",
+)
 
 
 def _utcnow_iso() -> str:
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
-class PicksDB:
-    def __init__(self, path: str | pathlib.Path = "picks.db"):
-        self.path = str(path)
-        self.conn = sqlite3.connect(self.path)
-        self.conn.row_factory = sqlite3.Row
-        self.conn.execute("PRAGMA foreign_keys = ON")
-        self._init_schema()
+def _is_postgres_url(target: str) -> bool:
+    return target.startswith(("postgres://", "postgresql://"))
 
-    def _init_schema(self) -> None:
-        with open(_SCHEMA_PATH, encoding="utf-8") as f:
-            self.conn.executescript(f.read())
-        self.conn.commit()
+
+def _normalize_row(row: dict) -> dict:
+    # Postgres hands back date/datetime objects; SQLite hands back strings.
+    return {
+        k: v.isoformat() if isinstance(v, (datetime.date, datetime.datetime)) else v
+        for k, v in row.items()
+    }
+
+
+class PicksDB:
+    def __init__(self, target: str | pathlib.Path):
+        target = str(target)
+        self.is_postgres = _is_postgres_url(target)
+        if self.is_postgres:
+            import psycopg
+            from psycopg.rows import dict_row
+
+            # prepare_threshold=None: Supabase's transaction pooler (port 6543)
+            # doesn't support prepared statements; harmless on the session pooler.
+            self.conn = psycopg.connect(target, row_factory=dict_row, prepare_threshold=None)
+            self._ph = "%s"
+        else:
+            self.conn = sqlite3.connect(target)
+            self.conn.row_factory = sqlite3.Row
+            self._ph = "?"
+            with open(_SCHEMA_PATH, encoding="utf-8") as f:
+                self.conn.executescript(f.read())
+            self.conn.commit()
+
+    @classmethod
+    def from_env(cls) -> "PicksDB":
+        """Connect to Supabase using DATABASE_URL (environment or .env)."""
+        try:
+            from dotenv import load_dotenv
+
+            load_dotenv(_PROJECT_ROOT / ".env")
+        except ImportError:
+            pass
+        url = os.environ.get("DATABASE_URL")
+        if not url:
+            raise RuntimeError(
+                "DATABASE_URL is not set. Copy .env.example to .env and paste your "
+                "Supabase connection string (Dashboard -> Connect -> Session pooler)."
+            )
+        if not _is_postgres_url(url):
+            raise RuntimeError("DATABASE_URL must be a postgresql:// URL (Supabase connection string).")
+        return cls(url)
 
     def close(self) -> None:
         self.conn.close()
@@ -40,6 +98,9 @@ class PicksDB:
 
     def __exit__(self, *exc) -> None:
         self.close()
+
+    def _execute(self, query: str, params: tuple | list = ()):
+        return self.conn.execute(query.replace("?", self._ph), params)
 
     # -- writes -----------------------------------------------------------
 
@@ -66,20 +127,21 @@ class PicksDB:
         if status not in VALID_STATUSES:
             raise ValueError(f"status must be one of {VALID_STATUSES}, got {status!r}")
         created_at = created_at or _utcnow_iso()
-        cur = self.conn.execute(
-            """INSERT INTO picks (
-                   created_at, sport, league, event, event_date, market, selection,
-                   decimal_odds, devig_method, model_prob, fair_market_prob, edge,
-                   kelly_stake, status, legacy_note, source
-               ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-            (
-                created_at, sport, league, event, event_date, market, selection,
-                decimal_odds, devig_method, model_prob, fair_market_prob, edge,
-                kelly_stake, status, legacy_note, source,
-            ),
+        values = (
+            created_at, sport, league, event, event_date, market, selection,
+            decimal_odds, devig_method, model_prob, fair_market_prob, edge,
+            kelly_stake, status, legacy_note, source,
         )
+        query = (
+            f"INSERT INTO picks ({', '.join(_COLUMNS)}) "
+            f"VALUES ({', '.join('?' * len(_COLUMNS))})"
+        )
+        if self.is_postgres:
+            pick_id = self._execute(query + " RETURNING id", values).fetchone()["id"]
+        else:
+            pick_id = self._execute(query, values).lastrowid
         self.conn.commit()
-        return int(cur.lastrowid)
+        return int(pick_id)
 
     def settle_pick(
         self,
@@ -91,7 +153,7 @@ class PicksDB:
         if status not in VALID_STATUSES or status == "pending":
             raise ValueError(f"settle status must be one of {VALID_STATUSES - {'pending'}}, got {status!r}")
         settled_at = settled_at or _utcnow_iso()
-        cur = self.conn.execute(
+        cur = self._execute(
             "UPDATE picks SET status = ?, result_note = ?, settled_at = ? WHERE id = ?",
             (status, result_note, settled_at, pick_id),
         )
@@ -102,8 +164,8 @@ class PicksDB:
     # -- reads --------------------------------------------------------------
 
     def get_pick(self, pick_id: int) -> dict | None:
-        row = self.conn.execute("SELECT * FROM picks WHERE id = ?", (pick_id,)).fetchone()
-        return dict(row) if row else None
+        row = self._execute("SELECT * FROM picks WHERE id = ?", (pick_id,)).fetchone()
+        return _normalize_row(dict(row)) if row else None
 
     def list_picks(
         self,
@@ -123,8 +185,7 @@ class PicksDB:
             query += " AND sport = ?"
             params.append(sport)
         query += f" ORDER BY {order_by}"
-        rows = self.conn.execute(query, params).fetchall()
-        return [dict(r) for r in rows]
+        return [_normalize_row(dict(r)) for r in self._execute(query, params).fetchall()]
 
     def graded_picks_for_evaluation(self) -> list[dict]:
         """Picks with both a real model_prob AND a clean win/loss outcome --
@@ -139,7 +200,7 @@ class PicksDB:
           credit the new engine for the old approach's luck (or blame it
           for the old approach's misses) -- keep the two eras separate.
         """
-        rows = self.conn.execute(
+        rows = self._execute(
             "SELECT * FROM picks WHERE status IN ('won','lost') AND model_prob IS NOT NULL"
         ).fetchall()
-        return [dict(r) for r in rows]
+        return [_normalize_row(dict(r)) for r in rows]

@@ -13,7 +13,10 @@ the new engine for the old, ungrounded approach. The old numbers
 legacy_note for provenance, never fed into evaluation.
 
 Usage:
-    python3 scripts/seed_from_legacy.py [path/to/picks.db]
+    python scripts/seed_from_legacy.py              # into Supabase (DATABASE_URL in .env)
+    python scripts/seed_from_legacy.py local.db     # into a local SQLite file instead
+
+Safe to re-run: if legacy rows from this doc are already there, it does nothing.
 """
 from __future__ import annotations
 
@@ -67,35 +70,44 @@ def build_legacy_note(row: dict, status: str) -> str | None:
     return "; ".join(parts) if parts else None
 
 
-def seed(db_path: str) -> int:
-    with PicksDB(db_path) as db:
-        n = 0
-        with open(SEED_CSV, encoding="utf-8", newline="") as f:
-            for row in csv.DictReader(f):
-                status = STATUS_MAP.get(row["acierto"].strip(), "pending")
-                market = MARKET_MAP.get(row["mercado"].strip(), row["mercado"].strip() or None)
-                decimal_odds = float(row["cuota_pick"]) if row.get("cuota_pick") else None
+def seed(db: PicksDB) -> int:
+    already = [p for p in db.list_picks() if (p.get("source") or "").startswith(SOURCE_DOC)]
+    if already:
+        return 0
+    n = 0
+    with open(SEED_CSV, encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            status = STATUS_MAP.get(row["acierto"].strip(), "pending")
+            market = MARKET_MAP.get(row["mercado"].strip(), row["mercado"].strip() or None)
+            decimal_odds = float(row["cuota_pick"]) if row.get("cuota_pick") else None
 
-                pid = db.add_pick(
-                    sport="soccer",
-                    league=row["liga"],
-                    event=row["partido"],
-                    event_date=row["fecha"],
-                    market=market or "unspecified",
-                    selection=row["pick"],
-                    decimal_odds=decimal_odds,
-                    model_prob=None,  # see module docstring: legacy picks are never model-graded
-                    status="pending",  # settle below if the CSV says otherwise; add_pick always starts pending
-                    legacy_note=build_legacy_note(row, status),
-                    source=f"{SOURCE_DOC}:tanda-{row['tanda']}",
-                )
-                if status != "pending":
-                    db.settle_pick(pid, status, result_note=row.get("resultado_real") or None)
-                n += 1
-        return n
+            pid = db.add_pick(
+                sport="soccer",
+                league=row["liga"],
+                event=row["partido"],
+                event_date=row["fecha"],
+                market=market or "unspecified",
+                selection=row["pick"],
+                decimal_odds=decimal_odds,
+                model_prob=None,  # see module docstring: legacy picks are never model-graded
+                status="pending",  # settle below if the CSV says otherwise; add_pick always starts pending
+                legacy_note=build_legacy_note(row, status),
+                source=f"{SOURCE_DOC}:tanda-{row['tanda']}",
+            )
+            if status != "pending":
+                db.settle_pick(pid, status, result_note=row.get("resultado_real") or None)
+            n += 1
+    return n
 
 
 if __name__ == "__main__":
-    db_path = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).resolve().parent.parent / "picks.db")
-    count = seed(db_path)
-    print(f"Imported {count} legacy picks into {db_path}")
+    if len(sys.argv) > 1:
+        target, db = sys.argv[1], PicksDB(sys.argv[1])
+    else:
+        target, db = "Supabase", PicksDB.from_env()
+    with db:
+        count = seed(db)
+    if count:
+        print(f"Imported {count} legacy picks into {target}")
+    else:
+        print(f"Legacy picks already present in {target}; nothing imported")

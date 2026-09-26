@@ -38,13 +38,15 @@ picks_engine/
     baseball.py               MLB: igual, constantes mucho más conservadoras
   valuation/ev.py        Edge (modelo vs mercado) + stake sugerido (Kelly fraccionado)
   tracking/
-    db.py                 SQLite: una fila por pick, de creación a resultado
-    schema.sql
+    db.py                 Supabase (Postgres): una fila por pick, de creación a resultado.
+                          SQLite solo para tests.
+    schema.sql            Esquema SQLite (tests) — espejo de supabase/migrations/
   evaluation/metrics.py   Brier score, log-loss, calibración, ROI en papel
-tests/                    62 tests, unittest puro (sin pytest, ver abajo)
+supabase/migrations/      Esquema de la tabla picks en Supabase (con RLS activado)
+tests/                    65 tests, unittest puro (sin pytest, ver abajo)
 data/seed_picks.csv       Los 15 picks originales del doc
 scripts/
-  seed_from_legacy.py      Importa data/seed_picks.csv a la DB
+  seed_from_legacy.py      Importa data/seed_picks.csv a Supabase (no duplica si se corre dos veces)
   example_end_to_end.py     Ejemplo completo: fit -> devig -> edge -> log -> settle -> evaluate
 ```
 
@@ -54,12 +56,36 @@ comentarios de relleno.
 
 ## Instalar y correr
 
+Requiere Python 3.10+ (en esta máquina: `py -3.14`).
+
 ```bash
-pip install -r requirements.txt   # solo scipy; todo lo demás es librería estándar
-python3 -m unittest discover -s tests -v   # 62 tests
-python3 scripts/seed_from_legacy.py         # importa los 15 picks históricos a picks.db
-python3 scripts/example_end_to_end.py       # pipeline completo de punta a punta
+py -3.14 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt            # scipy, psycopg, python-dotenv
+python -m unittest discover -s tests -v    # 65 tests (usan SQLite, no tocan Supabase)
+python scripts/example_end_to_end.py       # pipeline completo (DB en memoria, no toca Supabase)
+python scripts/seed_from_legacy.py         # importa los 15 picks históricos a Supabase
 ```
+
+### Configurar Supabase (una sola vez)
+
+1. Crea un proyecto en [supabase.com](https://supabase.com) y guarda la
+   contraseña de la base de datos.
+2. Dashboard → **SQL Editor** → pega y ejecuta
+   `supabase/migrations/20260922000000_create_picks.sql`.
+3. Dashboard → **Connect** → copia la cadena de **Session pooler** (funciona por
+   IPv4; la "Direct connection" es solo IPv6).
+4. Copia `.env.example` a `.env` y pega esa cadena en `DATABASE_URL`, con tu
+   contraseña. `.env` está en `.gitignore`; nunca lo subas.
+5. `python scripts/seed_from_legacy.py` para cargar los picks históricos.
+
+En código: `PicksDB.from_env()` se conecta a Supabase. `PicksDB(":memory:")`
+o `PicksDB("archivo.db")` usan SQLite (solo para tests/experimentos).
+
+RLS está activado en `picks` sin políticas: la clave pública `anon` no puede
+leer ni escribir nada. El motor en Python se conecta como dueño de la base
+(vía `DATABASE_URL`) y no se ve afectado. Cuando haya front con acceso
+directo, se agregan políticas explícitas.
 
 No usé `pytest` porque este sandbox no tiene acceso a PyPI en este momento
 (bloqueo de red del entorno, no una decisión de diseño) — los tests están en
@@ -102,7 +128,7 @@ extra. Si tu máquina sí tiene acceso a PyPI, `pip install pytest` y
   Kelly fraccionado (cuarto de Kelly por defecto) para no apostar como si
   el modelo fuera perfecto.
 
-- **`tracking/db.py`**: SQLite con una tabla `picks`. `add_pick` →
+- **`tracking/db.py`**: tabla `picks` en Supabase (Postgres); SQLite solo en tests. `add_pick` →
   `settle_pick` → `graded_picks_for_evaluation` (excluye a propósito los
   picks legacy sin modelo real y los que no tienen resultado aún).
 

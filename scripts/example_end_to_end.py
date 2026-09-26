@@ -76,8 +76,10 @@ def main() -> None:
     # two-way double-chance/lay price instead of this approximation.
     print(f"Edge estimado: {valuation.edge:+.1%}   Kelly (1/4) sugerido: {valuation.kelly_stake:.1%} del bankroll de papel")
 
-    # 5) Log it.
-    db = PicksDB("example.db")
+    # 5) Log it. In-memory SQLite on purpose: this demo settles a made-up
+    #    result below, and that must never land in the real Supabase table
+    #    where it would pollute evaluation. Real usage: PicksDB.from_env().
+    db = PicksDB(":memory:")
     pick_id = db.add_pick(
         sport="soccer",
         league="Liga BetPlay",
@@ -93,7 +95,7 @@ def main() -> None:
         kelly_stake=valuation.kelly_stake,
         source="example_end_to_end.py",
     )
-    print(f"\nPick #{pick_id} guardado en example.db (status=pending)")
+    print(f"\nPick #{pick_id} guardado en la DB de ejemplo en memoria (status=pending)")
 
     # 6) Settle it once the real result is known, then evaluate.
     db.settle_pick(pick_id, "won", result_note="Medellin gano/empato (ejemplo)")

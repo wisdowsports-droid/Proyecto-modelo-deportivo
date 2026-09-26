@@ -1,4 +1,8 @@
 # scipy is used for Shin's-method root-finding (market/devig.py).
-# Everything else is standard library on purpose (sqlite3, unittest, math,
-# statistics) so this runs anywhere without a package manager fight.
+# psycopg talks to Supabase (Postgres); python-dotenv loads DATABASE_URL from .env.
+# Everything else is standard library on purpose (sqlite3 for tests, unittest,
+# math, statistics) so this runs anywhere without a package manager fight.
+# Needs Python >= 3.10 (scipy's current releases dropped 3.8/3.9).
 scipy>=1.11
+psycopg[binary]>=3.2
+python-dotenv>=1.0

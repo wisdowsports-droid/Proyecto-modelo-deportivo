@@ -1,8 +1,16 @@
+import importlib.util
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from picks_engine.tracking.db import PicksDB
+
+_SEED_PATH = Path(__file__).resolve().parent.parent / "scripts" / "seed_from_legacy.py"
+_spec = importlib.util.spec_from_file_location("seed_from_legacy", _SEED_PATH)
+seed_from_legacy = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(seed_from_legacy)
 
 
 class TestPicksDB(unittest.TestCase):
@@ -75,6 +83,39 @@ class TestPicksDB(unittest.TestCase):
         self.assertIn(pid_graded, graded_ids)
         self.assertNotIn(pid_no_model, graded_ids)
         self.assertNotIn(pid_pending, graded_ids)
+
+
+class TestFromEnv(unittest.TestCase):
+    def setUp(self):
+        self._saved = os.environ.pop("DATABASE_URL", None)
+
+    def tearDown(self):
+        os.environ.pop("DATABASE_URL", None)
+        if self._saved is not None:
+            os.environ["DATABASE_URL"] = self._saved
+
+    def test_missing_url_raises(self):
+        with mock.patch("dotenv.load_dotenv"):  # don't pick up a real .env
+            with self.assertRaises(RuntimeError):
+                PicksDB.from_env()
+
+    def test_non_postgres_url_rejected(self):
+        os.environ["DATABASE_URL"] = "picks.db"
+        with mock.patch("dotenv.load_dotenv"):
+            with self.assertRaises(RuntimeError):
+                PicksDB.from_env()
+
+
+class TestSeedFromLegacy(unittest.TestCase):
+    def test_seed_is_idempotent(self):
+        with PicksDB(":memory:") as db:
+            first = seed_from_legacy.seed(db)
+            second = seed_from_legacy.seed(db)
+            self.assertEqual(first, 15)
+            self.assertEqual(second, 0)
+            self.assertEqual(len(db.list_picks()), 15)
+            # legacy picks never reach evaluation
+            self.assertEqual(db.graded_picks_for_evaluation(), [])
 
 
 if __name__ == "__main__":
