@@ -68,6 +68,9 @@ interface FixtureRow {
   odds_api_sport_key: string;
 }
 
+const HORIZON_DAYS = 10;
+const skipped: string[] = [];
+
 async function fetchOddsApiFixtures(onlyKeys: string[] | null = null): Promise<{ rows: FixtureRow[]; errors: string[] }> {
   const rows: FixtureRow[] = [];
   const errors: string[] = [];
@@ -97,6 +100,17 @@ async function fetchOddsApiFixtures(onlyKeys: string[] | null = null): Promise<{
   const toFetch = onlyKeys ? selected.filter((x) => onlyKeys.includes(x.key)) : selected;
   for (const sportInfo of toFetch) {
     try {
+      // Calendario: /events NO gasta creditos. Si la competicion no tiene
+      // partidos en los proximos HORIZON_DAYS dias (fin de temporada, fecha
+      // FIFA terminada, torneo acabado) se salta y no se gasta el credito
+      // de /odds. Vuelve sola cuando aparezcan partidos en el calendario.
+      const from = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+      const to = new Date(Date.now() + HORIZON_DAYS * 86400000).toISOString().replace(/\.\d{3}Z$/, "Z");
+      const evRes = await fetch(`https://api.the-odds-api.com/v4/sports/${sportInfo.key}/events?apiKey=${ODDS_API_KEY}&commenceTimeFrom=${from}&commenceTimeTo=${to}`);
+      if (evRes.ok) {
+        const upcoming: any[] = await evRes.json();
+        if (!upcoming.length) { skipped.push(sportInfo.key); continue; }
+      }
       // Futbol: region eu (trae Pinnacle y casas europeas, cubre selecciones);
       // resto: us. Sigue costando 1 credito por liga.
       const region = sportInfo.group === "Soccer" ? "eu" : "us";
@@ -232,6 +246,7 @@ async function fetchApiFootballColombia(): Promise<{ rows: FixtureRow[]; errors:
 }
 
 Deno.serve(async (req: Request) => {
+  skipped.length = 0;
   let onlyKeys: string[] | null = null;
   try { const body = await req.json(); if (Array.isArray(body?.only_keys) && body.only_keys.length) onlyKeys = body.only_keys; } catch (_e) { /* sin body */ }
   const [oddsApiResult, apiFootballResult] = await Promise.all([
@@ -266,6 +281,7 @@ Deno.serve(async (req: Request) => {
     upsertError,
     oddsApiRows: oddsApiResult.rows.length,
     apiFootballRows: apiFootballResult.rows.length,
+    pausedNoGamesSoon: skipped,
     modelRecomputed,
     modelRecomputeError,
     errors: [...oddsApiResult.errors, ...apiFootballResult.errors],
