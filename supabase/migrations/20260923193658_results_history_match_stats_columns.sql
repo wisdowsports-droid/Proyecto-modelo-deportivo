@@ -1,0 +1,13 @@
+alter table results_history add column if not exists home_shots int;
+alter table results_history add column if not exists away_shots int;
+alter table results_history add column if not exists home_shots_on_target int;
+alter table results_history add column if not exists away_shots_on_target int;
+alter table results_history add column if not exists home_corners int;
+alter table results_history add column if not exists away_corners int;
+alter table results_history add column if not exists home_yellow int;
+alter table results_history add column if not exists away_yellow int;
+alter table results_history add column if not exists home_red int;
+alter table results_history add column if not exists away_red int;
+alter table results_history add column if not exists home_fouls int;
+alter table results_history add column if not exists away_fouls int;
+alter table results_history add column if not exists season text;
