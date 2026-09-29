@@ -1,1093 +1,391 @@
 <title>Kinetik Picks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* Layout: tablero de pronosticos. Resumen de aciertos arriba, lista de partidos por dia y liga, resultados al final. */
   :root{
     --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#EEF1F5; --border:#DFE3E9;
-    --text:#12161C; --text-muted:#5B6472; --text-faint:#8891A0;
+    --text:#12161C; --text-muted:#5B6472; --text-faint:#7F8896;
     --accent:#0E9F6E; --accent-strong:#087A55; --accent-soft:#E3F6EE;
     --home:#0E9F6E; --draw:#B8860B; --away:#3B5FE0;
-    --danger:#C4432B; --ok:#0E9F6E;
+    --hi:#087A55; --hi-soft:#E3F6EE; --mid:#8A6508; --mid-soft:#FBF1D9; --lo:#5B6472; --lo-soft:#EEF1F5;
+    --danger:#C4432B; --danger-soft:#FBE7E3;
+    --f-display:"Oswald", "Arial Narrow", system-ui, sans-serif;
+    --f-body:"Public Sans", system-ui, -apple-system, sans-serif;
+    --f-data:"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       --bg:#0A0D12; --surface:#12161D; --surface-2:#1A1F28; --border:#262C37;
-      --text:#EDEFF3; --text-muted:#96A0AF; --text-faint:#6B7481;
+      --text:#EDEFF3; --text-muted:#9AA3B2; --text-faint:#7A8392;
       --accent:#2BD696; --accent-strong:#59E3AE; --accent-soft:#12281F;
-      --home:#2BD696; --draw:#E0AE3E; --away:#6C8CFF;
-      --danger:#F0725A; --ok:#2BD696;
+      --home:#2BD696; --draw:#E0AE3E; --away:#7C98FF;
+      --hi:#59E3AE; --hi-soft:#12281F; --mid:#E8BE5A; --mid-soft:#2A2312; --lo:#9AA3B2; --lo-soft:#1A1F28;
+      --danger:#F0725A; --danger-soft:#2E1813;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"]{
     --bg:#0A0D12; --surface:#12161D; --surface-2:#1A1F28; --border:#262C37;
-    --text:#EDEFF3; --text-muted:#96A0AF; --text-faint:#6B7481;
+    --text:#EDEFF3; --text-muted:#9AA3B2; --text-faint:#7A8392;
     --accent:#2BD696; --accent-strong:#59E3AE; --accent-soft:#12281F;
-    --home:#2BD696; --draw:#E0AE3E; --away:#6C8CFF;
-    --danger:#F0725A; --ok:#2BD696;
+    --home:#2BD696; --draw:#E0AE3E; --away:#7C98FF;
+    --hi:#59E3AE; --hi-soft:#12281F; --mid:#E8BE5A; --mid-soft:#2A2312; --lo:#9AA3B2; --lo-soft:#1A1F28;
+    --danger:#F0725A; --danger-soft:#2E1813;
     color-scheme: dark;
   }
 
   *{box-sizing:border-box}
-  body{
-    background:var(--bg); color:var(--text);
-    font-family:"Public Sans",system-ui,-apple-system,sans-serif;
-    font-size:14px; line-height:1.45;
-    padding-inline:16px; padding-block:0;
-    max-width:1180px; margin:0 auto;
-  }
-  h1,h2,h3{font-family:"Oswald",system-ui,sans-serif; font-weight:600; letter-spacing:.01em; text-wrap:balance; margin:0}
-  .mono{font-family:"JetBrains Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
-  a{color:var(--accent)}
+  body{background:var(--bg); color:var(--text); font-family:var(--f-body); font-size:14px; line-height:1.45;
+    padding-inline:16px; padding-block:0 32px; max-width:1100px; margin:0 auto}
+  h1,h2,h3{font-family:var(--f-display); font-weight:600; letter-spacing:.01em; text-wrap:balance; margin:0}
+  .num{font-family:var(--f-data); font-variant-numeric:tabular-nums}
+  button{font-family:inherit}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 
-  header.top{
-    position:sticky; top:env(safe-area-inset-top,0px); z-index:20;
-    background:var(--bg); border-bottom:1px solid var(--border);
-    padding-block:14px 12px; margin-bottom:18px;
-    display:flex; flex-direction:column; gap:12px;
-  }
+  header.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--bg);
+    border-bottom:1px solid var(--border); padding-block:14px 12px; margin-bottom:20px; display:flex; flex-direction:column; gap:10px}
   .brand{display:flex; align-items:center; gap:10px}
-  .brand .mark{
-    width:30px; height:30px; border-radius:8px; background:var(--accent);
-    display:flex; align-items:center; justify-content:center; flex:none;
-  }
+  .brand .mark{width:30px; height:30px; border-radius:8px; background:var(--accent); display:flex; align-items:center; justify-content:center; flex:none}
   .brand .mark svg{width:16px; height:16px}
-  .brand h1{font-size:19px; color:var(--text)}
+  .brand h1{font-size:19px}
   .brand .tag{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em}
-
-  .filters{display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none}
+  .filters{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px}
   .filters::-webkit-scrollbar{display:none}
-  .chip{
-    flex:none; padding:7px 14px; border-radius:999px; border:1px solid var(--border);
-    background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:600;
-    cursor:pointer; transition:background .15s,color .15s,border-color .15s;
-  }
+  .chip{flex:none; padding:6px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface);
+    color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer}
   .chip:hover{border-color:var(--accent)}
-  .chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:#04140D}
-  :root[data-theme="dark"] .chip[aria-pressed="true"],
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#04140D}}
+  .chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+  .sep{width:1px; background:var(--border); flex:none}
 
-  main{display:grid; grid-template-columns:1fr; gap:22px}
-  @media (min-width:860px){ main{grid-template-columns:1fr 320px} }
-
+  section{margin-bottom:28px}
   .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px}
-  .section-head h2{font-size:16px}
-  .section-head .meta{font-size:12px; color:var(--text-faint)}
-  .note{font-size:12px; color:var(--text-faint); margin:-4px 0 14px}
+  .section-head h2{font-size:17px}
+  .meta{font-size:12px; color:var(--text-faint)}
+  .note{font-size:12.5px; color:var(--text-muted); margin:-2px 0 14px; max-width:70ch}
 
-  .league-group{margin-bottom:20px}
-  .league-title{
-    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
-    color:var(--text-faint); padding:6px 2px; border-bottom:1px solid var(--border); margin-bottom:8px;
-  }
+  /* aciertos */
+  .kpis{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+  @media (max-width:720px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .kpi{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-width:0}
+  .kpi .l{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px}
+  .kpi .v{font-family:var(--f-data); font-size:24px; font-weight:700}
+  .kpi .s{font-size:11.5px; color:var(--text-muted); margin-top:2px}
+  .conf-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .conf-item{display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:12.5px; color:var(--text-muted)}
+  .conf-item b{font-family:var(--f-data); color:var(--text)}
 
-  .match-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:12px;
-    padding:12px 14px; margin-bottom:8px;
-  }
-  .match-row1{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px}
-  .teams{font-weight:600; font-size:14px}
-  .teams .vs{color:var(--text-faint); font-weight:400; padding:0 4px}
-  .when{font-size:11.5px; color:var(--text-faint); white-space:nowrap; text-align:right}
+  /* dia / liga */
+  .day{margin-bottom:18px}
+  .day-title{font-family:var(--f-display); font-size:14px; color:var(--text); padding:4px 2px 8px; border-bottom:2px solid var(--text); margin-bottom:10px}
+  .league{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-faint); margin:12px 2px 6px}
+  .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+  @media (max-width:760px){ .grid{grid-template-columns:minmax(0,1fr)} }
 
-  .probs{display:flex; flex-direction:column; gap:6px}
-  .probs .src{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:2px}
-  .probbar{display:flex; height:8px; border-radius:5px; overflow:hidden; background:var(--surface-2)}
-  .probbar span{height:100%}
-  .probbar .h{background:var(--home)} .probbar .d{background:var(--draw)} .probbar .a{background:var(--away)}
-  .problabels{display:flex; justify-content:space-between; font-size:11.5px; margin-top:4px}
-  .problabels .l{display:flex; align-items:center; gap:5px; color:var(--text-muted)}
-  .dot{width:7px; height:7px; border-radius:50%; flex:none}
-  .dot.h{background:var(--home)} .dot.d{background:var(--draw)} .dot.a{background:var(--away)}
-  .problabels b{color:var(--text); font-family:"JetBrains Mono",monospace; font-weight:600}
-  .odds-line{font-size:11px; color:var(--text-faint); margin-top:8px; font-family:"JetBrains Mono",monospace}
-  .result-row{display:flex; align-items:center; gap:10px; margin-bottom:10px}
-  .result-row .score{font-family:"JetBrains Mono",monospace; font-weight:700; font-size:16px}
+  .fc{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-width:0; display:flex; flex-direction:column; gap:10px}
+  .fc-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+  .teams{font-weight:600; font-size:14px; min-width:0}
+  .teams .vs{color:var(--text-faint); font-weight:400; padding:0 5px}
+  .when{font-size:11.5px; color:var(--text-faint); white-space:nowrap; font-family:var(--f-data)}
+  .verdict{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .verdict .pick{font-family:var(--f-display); font-size:18px; font-weight:600}
+  .verdict .pct{font-family:var(--f-data); font-size:18px; font-weight:700; color:var(--accent-strong)}
+  .conf{font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; padding:3px 8px; border-radius:999px}
+  .conf.alta{background:var(--hi-soft); color:var(--hi)} .conf.media{background:var(--mid-soft); color:var(--mid)} .conf.baja{background:var(--lo-soft); color:var(--lo)}
+  .bar{display:flex; height:8px; border-radius:5px; overflow:hidden; background:var(--surface-2)}
+  .bar span{height:100%} .bar .h{background:var(--home)} .bar .d{background:var(--draw)} .bar .a{background:var(--away)}
+  .bar-l{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); margin-top:4px; gap:6px}
+  .bar-l span{display:flex; align-items:center; gap:5px; min-width:0}
+  .bar-l b{font-family:var(--f-data); color:var(--text)}
+  .dot{width:7px; height:7px; border-radius:50%; flex:none} .dot.h{background:var(--home)} .dot.d{background:var(--draw)} .dot.a{background:var(--away)}
+  .mk{display:flex; flex-wrap:wrap; gap:6px}
+  .mk span{background:var(--surface-2); border-radius:8px; padding:4px 8px; font-size:12px; color:var(--text-muted)}
+  .mk b{font-family:var(--f-data); color:var(--text); font-weight:700}
+  .src{font-size:11px; color:var(--text-faint)}
 
-  .expand-toggle{
-    display:flex; align-items:center; gap:6px; margin-top:10px; padding-top:9px;
-    border-top:1px solid var(--border); font-size:12px; font-weight:600; color:var(--accent);
-    cursor:pointer; user-select:none; background:none; border-left:none; border-right:none; border-bottom:none;
-    width:100%; text-align:left;
-  }
-  .expand-toggle .chev{transition:transform .15s; flex:none}
-  .expand-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
-  .markets-panel{margin-top:10px; display:flex; flex-direction:column; gap:12px}
-  .market-block .m-title{font-size:11.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px}
-  .market-outcomes{display:flex; flex-wrap:wrap; gap:6px}
-  .m-outcome{
-    background:var(--surface-2); border-radius:8px; padding:5px 9px; font-size:12px;
-    display:flex; gap:6px; align-items:baseline; white-space:nowrap;
-  }
-  .m-outcome .nm{color:var(--text-muted)}
-  .m-outcome .pr{font-family:"JetBrains Mono",monospace; font-weight:700; color:var(--text)}
-  .markets-note{font-size:11.5px; color:var(--text-faint)}
-  .pick-row{
-    background:var(--surface-2); border-radius:8px; padding:7px 10px; margin-bottom:6px;
-    border:1px solid transparent;
-  }
-  .pick-row.is-value{background:var(--accent-soft); border-color:var(--accent)}
-  .pick-row-head{display:flex; align-items:center; justify-content:space-between; gap:8px}
-  .pick-row-sel{font-weight:700; font-size:13px}
-  .pick-row-nums{font-size:11px; color:var(--text-muted); margin-top:2px; font-family:"JetBrains Mono",monospace}
-  .value-badge{
-    background:var(--accent); color:#04140D; font-size:10.5px; font-weight:800;
-    padding:2px 7px; border-radius:999px; letter-spacing:.02em; white-space:nowrap;
-  }
-  .markets-loading{font-size:12px; color:var(--text-faint); display:flex; align-items:center; gap:8px}
-  .spinner{
-    width:12px; height:12px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--accent);
-    animation:spin .7s linear infinite; flex:none;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
+  /* resultados */
+  .res-list{display:flex; flex-direction:column; gap:6px}
+  .res{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:9px 12px}
+  .mark-ok,.mark-no{width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px}
+  .mark-ok{background:var(--hi-soft); color:var(--hi)} .mark-no{background:var(--danger-soft); color:var(--danger)}
+  .res .t{font-size:13px; font-weight:600; min-width:0}
+  .res .d{font-size:11.5px; color:var(--text-faint)}
+  .res .sc{font-family:var(--f-data); font-weight:700}
 
-  aside{display:flex; flex-direction:column; gap:14px}
-  .pick-card{
-    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px;
-  }
-  .pick-event{font-weight:600; font-size:13px; margin-bottom:3px}
-  .pick-meta{font-size:11.5px; color:var(--text-faint); margin-bottom:8px}
-  .pick-sel{font-size:12.5px; color:var(--text-muted); margin-bottom:8px}
-  .badge{
-    display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
-    padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:.03em;
-  }
-  .badge.pending{background:var(--surface-2); color:var(--text-muted)}
-  .badge.won{background:var(--accent-soft); color:var(--accent-strong)}
-  .badge.lost{background:color-mix(in srgb, var(--danger) 16%, transparent); color:var(--danger)}
-  .badge.no_pick,.badge.push,.badge.void{background:var(--surface-2); color:var(--text-faint)}
-  .pick-result{font-size:11.5px; color:var(--text-faint); margin-top:8px; padding-top:8px; border-top:1px solid var(--border)}
-
-  .state-box{
-    background:var(--surface); border:1px dashed var(--border); border-radius:12px;
-    padding:22px 16px; text-align:center; color:var(--text-muted); font-size:13px;
-  }
-  .state-box .fix{margin-top:8px; font-size:12px}
-  .state-box .fix a{font-weight:600}
-  .skel{background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 37%,var(--surface-2) 63%); background-size:400% 100%; animation:sk 1.4s ease infinite; border-radius:8px}
+  .state-box{background:var(--surface); border:1px dashed var(--border); border-radius:12px; padding:20px 16px; text-align:center; color:var(--text-muted); font-size:13px}
+  .state-box a{color:var(--accent-strong); font-weight:600}
+  .skel{background:linear-gradient(90deg,var(--surface-2) 25%,var(--border) 37%,var(--surface-2) 63%); background-size:400% 100%; animation:sk 1.4s ease infinite; border-radius:10px}
   @keyframes sk{0%{background-position:100% 0}100%{background-position:0 0}}
   @media (prefers-reduced-motion:reduce){ .skel{animation:none} }
-
-  footer{padding-block:24px 32px; text-align:center; font-size:11.5px; color:var(--text-faint)}
-
-  .stats-section{margin-bottom:22px}
-  #resultsSection{margin-bottom:22px}
-  .kpi-row{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px}
-  @media (min-width:640px){ .kpi-row{grid-template-columns:repeat(4,1fr)} }
-  .kpi-tile{
-    background:var(--surface); border:1px solid var(--border); border-radius:12px;
-    padding:12px 14px;
-  }
-  .kpi-tile .kpi-label{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px}
-  .kpi-tile .kpi-value{font-family:"JetBrains Mono",monospace; font-size:22px; font-weight:700; color:var(--text)}
-  .kpi-tile .kpi-sub{font-size:11px; color:var(--text-muted); margin-top:3px}
-  .kpi-tile.warn .kpi-value{color:var(--danger)}
-  .kpi-tile.ok .kpi-value{color:var(--accent-strong)}
-
-  .breakdown-table{width:100%; border-collapse:collapse; font-size:12.5px}
-  .breakdown-table th{
-    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
-    color:var(--text-faint); font-weight:700; padding:6px 8px; border-bottom:1px solid var(--border);
-  }
-  .breakdown-table td{padding:7px 8px; border-bottom:1px solid var(--border); color:var(--text-muted)}
-  .breakdown-table td.num{font-family:"JetBrains Mono",monospace; color:var(--text); text-align:right}
-  .breakdown-table tr:last-child td{border-bottom:none}
-  .rate-bar{display:inline-block; width:46px; height:6px; border-radius:3px; background:var(--surface-2); overflow:hidden; margin-left:8px; vertical-align:middle}
-  .rate-bar span{display:block; height:100%; background:var(--accent)}
-  .stats-note{font-size:11.5px; color:var(--text-faint); margin-top:10px}
-  .stats-block{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:12px}
-  .stats-block h3{font-size:13px; margin-bottom:8px}
-
-  /* ---- Buscador de cuotas ---- */
-  #finderSection{margin-bottom:22px}
-  .finder-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px}
-  .btn{padding:8px 14px; border-radius:999px; border:1px solid var(--accent); background:var(--accent); color:#04140D; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit}
-  .btn[disabled]{opacity:.55; cursor:wait}
-  .btn.ghost{background:var(--surface); color:var(--accent-strong)}
-  .finder-status{font-size:12px; color:var(--text-muted)}
-  .opp-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 14px; margin-bottom:8px; display:grid; grid-template-columns:1fr auto; gap:4px 12px; align-items:center}
-  .opp-card .ev{font-family:"JetBrains Mono",monospace; font-weight:800; font-size:15px; color:var(--accent-strong); text-align:right}
-  .opp-card .sub{font-size:11.5px; color:var(--text-faint)}
-  .opp-card .sel{font-size:13px; color:var(--text-muted)}
-  .opp-card .sel b{color:var(--text); font-family:"JetBrains Mono",monospace}
-  .calc{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px}
-  .calc h3{font-size:13px; margin-bottom:8px}
-  .calc select, .calc input{width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font:inherit; font-size:13px}
-  .calc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px}
-  .calc-cell{background:var(--surface-2); border-radius:8px; padding:8px}
-  .calc-cell .lbl{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px}
-  .calc-cell .fair{font-size:11.5px; color:var(--text-muted); margin-top:5px; font-family:"JetBrains Mono",monospace}
-  .calc-cell .res{font-size:12px; font-weight:700; margin-top:4px; font-family:"JetBrains Mono",monospace}
-  .calc-cell .res.pos{color:var(--accent-strong)} .calc-cell .res.neg{color:var(--danger)}
-  .warn-line{font-size:12px; color:var(--danger); margin-top:8px}
-  @media (max-width:520px){ .calc-grid{grid-template-columns:1fr} }
+  footer{padding-block:12px 0; text-align:center; font-size:11.5px; color:var(--text-faint); display:flex; flex-direction:column; gap:6px; align-items:center}
+  .quota{font-family:var(--f-data)}
+  .quota.low{color:var(--danger); font-weight:700}
 </style>
 
 <header class="top">
   <div class="brand">
-    <div class="mark">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 17L9 11L13 15L21 6" stroke="#04140D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M15 6H21V12" stroke="#04140D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 17L9 11L13 15L21 6" stroke="#04140D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6H21V12" stroke="#04140D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div>
       <h1>Kinetik Picks</h1>
-      <div class="tag">Prueba en papel — sin dinero real</div>
+      <div class="tag">Pronósticos · prueba en papel</div>
     </div>
   </div>
-  <div class="filters" id="filters" role="tablist" aria-label="Filtrar por deporte"></div>
+  <div class="filters" id="sportFilters" role="group" aria-label="Deporte"></div>
+  <div class="filters" id="confFilters" role="group" aria-label="Confianza"></div>
 </header>
 
-<section id="finderSection">
-  <div class="section-head">
-    <h2>Buscador de cuotas</h2>
-    <span class="meta" id="finderMeta"></span>
-  </div>
-  <p class="note">Precio justo = cuota de Pinnacle sin margen. Aquí aparecen las casas que pagan más que ese precio (valor esperado ≥ 2%). En el backtest (~75.000 partidos) apostar así dio ganancia; con el modelo propio, no. Revisa la cuota en tu casa antes de apostar: cambian rápido.</p>
-  <div class="finder-bar">
-    <button class="btn" id="refreshOddsBtn" type="button">Actualizar cuotas (fútbol, próx. 7 días)</button>
-    <span class="finder-status" id="finderStatus"></span>
-  </div>
-  <div id="finderBody"><div class="skel" style="height:120px"></div></div>
-  <div class="calc" id="calcBox" style="margin-top:12px">
-    <h3>Calculadora para Betplay, Rushbet u otra casa</h3>
-    <select id="calcFixture" aria-label="Partido"><option value="">Cargando partidos…</option></select>
-    <div class="calc-grid" id="calcGrid"></div>
-    <div class="warn-line" id="calcWarn"></div>
-  </div>
+<section id="accuracy">
+  <div class="section-head"><h2>Aciertos del pronosticador</h2><span class="meta" id="accMeta"></span></div>
+  <p class="note">Cada pronóstico se guarda 3 horas antes del partido y se califica solo cuando termina. Referencia: acertar al azar el resultado de un partido de fútbol es 33 %.</p>
+  <div id="accBody"><div class="skel" style="height:110px"></div></div>
 </section>
 
-<section class="stats-section" id="statsSection">
-  <div class="section-head">
-    <h2>Cómo vamos</h2>
-    <span class="meta" id="statsMeta"></span>
-  </div>
-  <div id="statsBody"><div class="skel" style="height:180px"></div></div>
+<section id="upcoming">
+  <div class="section-head"><h2>Próximos pronósticos</h2><span class="meta" id="upMeta"></span></div>
+  <div id="upBody"><div class="skel" style="height:320px"></div></div>
 </section>
 
-<section id="resultsSection">
-  <div class="section-head">
-    <h2>Resultados recientes</h2>
-    <span class="meta" id="resultsMeta"></span>
-  </div>
-  <p class="note">Últimos 4 días — incluye partidos sin pick formal (el modelo no vio valor en ningún mercado), no solo los que están en "Mis picks".</p>
-  <div id="resultsBody"><div class="skel" style="height:160px"></div></div>
+<section id="results">
+  <div class="section-head"><h2>Últimos resultados</h2><span class="meta" id="resMeta"></span></div>
+  <div id="resBody"><div class="skel" style="height:140px"></div></div>
 </section>
 
-<main>
-  <section id="fixturesCol">
-    <div class="section-head">
-      <h2>Próximos partidos</h2>
-      <span class="meta" id="fixturesMeta"></span>
-    </div>
-    <p class="note">Fútbol de Colombia se sigue a mano por ahora (el feed automático no cubre la temporada actual) — pregúntame en el chat.</p>
-    <div id="fixturesBody"><div class="skel" style="height:280px"></div></div>
-  </section>
-
-  <aside>
-    <div class="section-head" style="margin-bottom:0">
-      <h2>Mis picks</h2>
-      <span class="meta" id="picksMeta"></span>
-    </div>
-    <div id="picksBody"><div class="skel" style="height:220px"></div></div>
-  </aside>
-</main>
-
-<footer>Probabilidades del modelo propio (Poisson/Elo) y precio justo de Pinnacle — no es asesoría de apuestas.</footer>
+<footer>
+  <div>Resultado: modelo propio combinado con la probabilidad del mercado. Goles, córners y tarjetas: modelo propio. Pronósticos, no asesoría de apuestas.</div>
+  <div class="quota" id="quota"></div>
+</footer>
 
 <script>
 (function(){
   "use strict";
   var SERVER = "Supabase - picks-engine";
-  var SPORTS = [
-    {key:"all", label:"Todos"},
-    {key:"soccer", label:"Fútbol"},
-    {key:"basketball", label:"Baloncesto"},
-    {key:"tennis", label:"Tenis"},
-    {key:"football", label:"Fútbol americano"},
-    {key:"baseball", label:"Béisbol"}
-  ];
-  var state = { sport:"all", fixtures:null, fixturesError:null, picks:null, picksError:null, expanded:{}, marketsCache:{}, statsFixtures:null, statsError:null, picksForStats:null, results:null, resultsError:null };
+  var SPORTS = [["all","Todos"],["soccer","Fútbol"],["football","Fútbol americano"],["basketball","Baloncesto"],["baseball","Béisbol"],["tennis","Tenis"]];
+  var CONFS = [["all","Toda confianza"],["alta","Alta"],["media","Media"],["baja","Baja"]];
+  var st = { sport:"all", conf:"all", board:null, boardErr:null, results:null, summary:null };
 
-  var MARKET_LABELS = {
-    totals:"Goles totales", totals_h1:"Goles 1er tiempo", btts:"Ambos anotan",
-    btts_h1:"Ambos anotan (1er tiempo)", double_chance:"Doble oportunidad",
-    draw_no_bet:"Empate anula (DNB)", correct_score:"Marcador exacto (más probables)",
-    alternate_totals_corners:"Córners totales", alternate_totals_cards:"Tarjetas totales",
-    player_goal_scorer_anytime:"Goleador (en cualquier momento)",
-    spreads:"Hándicap", alternate_totals:"Totales alternativos", alternate_spreads:"Hándicap alternativo",
-    h2h_lay:null // mercado de casa de intercambio (Betfair) -- no lo mostramos, ya tenemos h2h normal
-  };
-  var MARKET_ORDER = ["totals","btts","double_chance","draw_no_bet","totals_h1","btts_h1",
-    "spreads","alternate_spreads","alternate_totals","alternate_totals_corners",
-    "alternate_totals_cards","player_goal_scorer_anytime","correct_score"];
+  function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function pct(v){ return Math.round(v * 100) + "%"; }
+  function dec(v){ return (+v).toFixed(1).replace(".", ","); }
 
-  function el(tag, cls, html){
-    var e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (html != null) e.innerHTML = html;
-    return e;
-  }
-
-  function renderFilters(){
-    var box = document.getElementById("filters");
-    box.innerHTML = "";
-    SPORTS.forEach(function(s){
-      var b = el("button", "chip", s.label);
-      b.type = "button";
-      b.setAttribute("role","tab");
-      b.setAttribute("aria-pressed", String(s.key === state.sport));
-      b.addEventListener("click", function(){ state.sport = s.key; renderFilters(); renderFixtures(); renderResults(); });
-      box.appendChild(b);
-    });
-  }
-
-  // ---- extract the JSON payload from execute_sql's wrapped-text result ----
   function extractRows(payload){
-    // payload is the MCP call's structured/text payload. Shapes seen:
-    //   {result: "...<untrusted-data-XXXX>\n[...]\n</untrusted-data-XXXX>..."}
-    //   or already a plain array/object in future server versions.
     if (Array.isArray(payload)) return payload;
-    var text = (payload && typeof payload.result === "string") ? payload.result
-             : (typeof payload === "string" ? payload : null);
+    var text = (payload && typeof payload.result === "string") ? payload.result : (typeof payload === "string" ? payload : null);
     if (!text) return [];
     var m = text.match(/<untrusted-data-[0-9a-f-]+>\n([\s\S]*?)\n<\/untrusted-data-[0-9a-f-]+>/);
     if (!m) return [];
     try { return JSON.parse(m[1]); } catch(e){ return []; }
   }
-
-  function sqlIdent(s){ return String(s).replace(/[^a-zA-Z0-9_ ]/g, ""); }
-
   async function runQuery(query){
     var mcp = await window.claude.use("mcp");
-    if (!mcp) return { error: {code:"not_granted"} };
-    try {
-      var res = await mcp.callTool(SERVER, "execute_sql", { query: query });
-      return { rows: extractRows(res.payload) };
-    } catch(err){
-      return { error: err || {code:"upstream_error"} };
-    }
+    if (!mcp) return { error:{ code:"not_granted" } };
+    try { var res = await mcp.callTool(SERVER, "execute_sql", { query: query }); return { rows: extractRows(res.payload) }; }
+    catch(err){ return { error: err || { code:"upstream_error" } }; }
   }
-
   function errorCopy(code){
     switch(code){
-      case "needs_reauth": return "Tu conexión con Supabase expiró — reconéctala en Configuración → Conectores.";
-      case "server_not_connected": return "Supabase no está conectado en esta cuenta — agrégalo en Configuración → Conectores.";
-      case "selection_required": return "Hay más de una conexión de Supabase disponible — elige una cuando te lo pida.";
-      case "not_granted":
-      case "capability_disabled": return "Este visor no puede usar datos en vivo aquí.";
+      case "needs_reauth": return "Tu conexión con Supabase expiró. Reconéctala en Configuración → Conectores.";
+      case "server_not_connected": return "Supabase no está conectado en esta cuenta. Agrégalo en Configuración → Conectores.";
+      case "not_granted": case "capability_disabled": return "Esta vista no puede leer datos en vivo.";
       case "blocked_by_policy": return "Tu organización bloqueó esta conexión.";
-      case "server_unavailable": return "Supabase no respondió a tiempo — reintentando.";
-      default: return "No se pudo cargar en este momento.";
+      default: return "No se pudo cargar en este momento. Recarga la página en un minuto.";
     }
   }
-
-  function pct(n){ return (n*100).toFixed(0) + "%"; }
-
-  function marketDevig(home, draw, away){
-    // multiplicative de-vig, client side, only used when the model hasn't
-    // scored this fixture yet -- always labeled "Mercado", never presented
-    // as the model's own number.
-    var ph = home ? 1/home : 0, pd = draw ? 1/draw : 0, pa = away ? 1/away : 0;
-    var tot = ph + pd + pa;
-    if (!tot) return null;
-    return { h: ph/tot, d: draw ? pd/tot : 0, a: pa/tot };
+  function errBox(code){
+    var b = el("div","state-box", esc(errorCopy(code)));
+    b.appendChild(el("div", null, '<a href="https://claude.ai/settings/connectors" target="_blank" rel="noopener">Abrir Configuración → Conectores</a>'));
+    return b;
   }
-
-  function deriveProbs(fx){
-    // Compartido entre las tarjetas de partido y el tablero de "Como vamos":
-    // usa el modelo propio si ya lo calculamos para este partido, si no
-    // cae a la cuota de mercado desvigada -- siempre rotulando cual de los
-    // dos es, nunca mezclandolos sin avisar.
-    var hasModel = fx.model_prob_home != null;
-    if (hasModel) {
-      return { probs: { h: +fx.model_prob_home, d: +(fx.model_prob_draw||0), a: +fx.model_prob_away }, src: "Modelo", hasModel: true };
-    }
-    var dv = marketDevig(+fx.odds_home, fx.odds_draw ? +fx.odds_draw : null, +fx.odds_away);
-    if (dv) return { probs: dv, src: "Mercado (implícita)", hasModel: false };
-    return { probs: null, src: null, hasModel: false };
+  function fmtTime(iso){ try { return new Date(iso).toLocaleTimeString("es-CO", { hour:"2-digit", minute:"2-digit" }); } catch(e){ return ""; } }
+  function fmtDay(iso){
+    var d = new Date(iso), t = new Date(); t.setHours(0,0,0,0);
+    var dd = new Date(d); dd.setHours(0,0,0,0);
+    var diff = Math.round((dd - t) / 86400000);
+    var base = d.toLocaleDateString("es-CO", { weekday:"long", day:"numeric", month:"long" });
+    base = base.charAt(0).toUpperCase() + base.slice(1);
+    return diff === 0 ? "Hoy · " + base : diff === 1 ? "Mañana · " + base : base;
   }
+  function shortDate(iso){ try { return new Date(iso).toLocaleDateString("es-CO", { day:"2-digit", month:"short" }); } catch(e){ return ""; } }
 
-  function sportLabel(k){
-    var s = SPORTS.find(function(s){ return s.key === k; });
-    return s ? s.label : k;
-  }
-
-  function fmtWhen(iso){
-    try {
-      var d = new Date(iso);
-      return d.toLocaleString("es-CO", { weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
-    } catch(e){ return iso; }
-  }
-
-  function matchCard(fx){
-    var d0 = deriveProbs(fx);
-    var probs = d0.probs, src = d0.src, hasModel = d0.hasModel;
-
-    var isFinished = fx.status === "finished" && fx.home_score != null && fx.away_score != null;
-
-    var card = el("div", "match-card");
-    var row1 = el("div", "match-row1");
-    row1.appendChild(el("div", "teams", esc(fx.home_team) + '<span class="vs">vs</span>' + esc(fx.away_team)));
-    row1.appendChild(el("div", "when", isFinished ? "Finalizado" : fmtWhen(fx.commence_time)));
-    card.appendChild(row1);
-
-    if (isFinished) {
-      var resultRow = el("div", "result-row");
-      var scoreText = fx.home_score + " - " + fx.away_score;
-      resultRow.appendChild(el("div", "score", scoreText));
-      if (probs) {
-        // Si hay modelo, se evalua el modelo; si no (ej. WNBA, sin calibrar
-        // todavia), se evalua el favorito implicito del mercado -- nunca se
-        // deja el partido sin veredicto solo porque falte el modelo, pero
-        // siempre se rotula de cual de los dos se trata.
-        var homeWon = fx.home_score > fx.away_score, awayWon = fx.away_score > fx.home_score, draw = fx.home_score === fx.away_score;
-        var favSide = probs.h >= probs.a && probs.h >= (probs.d||0) ? "h" : (probs.d && probs.d >= probs.a ? "d" : "a");
-        var hit = (favSide === "h" && homeWon) || (favSide === "a" && awayWon) || (favSide === "d" && draw);
-        var badgeLabel = hasModel ? (hit ? "Modelo acertó" : "Modelo falló") : (hit ? "Mercado acertó" : "Mercado falló");
-        resultRow.appendChild(el("span", "badge " + (hit ? "won" : "lost"), badgeLabel));
-      }
-      card.appendChild(resultRow);
-    }
-
-    if (probs) {
-      var wrap = el("div", "probs");
-      wrap.appendChild(el("div", "src", src));
-      var bar = el("div", "probbar");
-      bar.appendChild(el("span", "h")).style.width = (probs.h*100) + "%";
-      if (probs.d) bar.appendChild(el("span", "d")).style.width = (probs.d*100) + "%";
-      bar.appendChild(el("span", "a")).style.width = (probs.a*100) + "%";
-      wrap.appendChild(bar);
-      var labels = el("div", "problabels");
-      labels.appendChild(el("span", "l", '<span class="dot h"></span>Local <b>' + pct(probs.h) + "</b>"));
-      if (fx.odds_draw) labels.appendChild(el("span", "l", '<span class="dot d"></span>Empate <b>' + pct(probs.d) + "</b>"));
-      labels.appendChild(el("span", "l", '<span class="dot a"></span>Visitante <b>' + pct(probs.a) + "</b>"));
-      wrap.appendChild(labels);
-      card.appendChild(wrap);
-    } else {
-      card.appendChild(el("div", "note", "Sin cuota ni modelo todavía."));
-    }
-
-    var oddsBits = [];
-    if (fx.odds_home) oddsBits.push("1: " + (+fx.odds_home).toFixed(2));
-    if (fx.odds_draw) oddsBits.push("X: " + (+fx.odds_draw).toFixed(2));
-    if (fx.odds_away) oddsBits.push("2: " + (+fx.odds_away).toFixed(2));
-    if (oddsBits.length) card.appendChild(el("div", "odds-line", oddsBits.join("   ·   ")));
-
-    if (String(fx.external_id || "").indexOf("oddsapi_") === 0) {
-      var toggle = el("button", "expand-toggle");
-      toggle.type = "button";
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.innerHTML = '<span class="chev">▾</span><span class="lbl">Ver más mercados</span>';
-      var panel = el("div", "markets-panel");
-      panel.style.display = "none";
-      toggle.addEventListener("click", function(){ toggleMarkets(fx, toggle, panel); });
-      card.appendChild(toggle);
-      card.appendChild(panel);
-    }
-
-    return card;
-  }
-
-  function fmtPrice(p){ return (+p).toFixed(2); }
-
-  function aggregateOutcomes(entries){
-    // entries: [{bookmaker, outcomes:[{name, point, price}]}] -> promedio de precio
-    // por combinacion (name + linea), para no listar 20 casas de apuestas repetidas.
-    var groups = {}; // key -> {label, prices:[]}
-    entries.forEach(function(e){
-      (e.outcomes || []).forEach(function(o){
-        var key = o.name + (o.point != null ? " " + o.point : "");
-        if (!groups[key]) groups[key] = { label: key, prices: [] };
-        groups[key].prices.push(+o.price);
+  function renderFilters(){
+    [["sportFilters", SPORTS, "sport"], ["confFilters", CONFS, "conf"]].forEach(function(cfg){
+      var box = document.getElementById(cfg[0]); box.innerHTML = "";
+      cfg[1].forEach(function(o){
+        var b = el("button","chip", esc(o[1])); b.type = "button";
+        b.setAttribute("aria-pressed", String(st[cfg[2]] === o[0]));
+        b.addEventListener("click", function(){ st[cfg[2]] = o[0]; renderFilters(); renderBoard(); renderResults(); });
+        box.appendChild(b);
       });
     });
-    return Object.keys(groups).map(function(k){
-      var g = groups[k];
-      var avg = g.prices.reduce(function(a,b){return a+b;},0) / g.prices.length;
-      return { label: g.label, avg: avg, n: g.prices.length };
-    });
   }
 
-  function pickRow(label, ev){
-    // fila destacada: que dice el modelo, comparado con lo que paga el mercado
-    var row = el("div", "pick-row " + (ev.is_value ? "is-value" : ""));
-    var head = el("div", "pick-row-head");
-    head.appendChild(el("span", "pick-row-sel", esc(label)));
-    if (ev.is_value) head.appendChild(el("span", "value-badge", "VALOR +" + (ev.edge*100).toFixed(1) + "%"));
-    row.appendChild(head);
-    row.appendChild(el("div", "pick-row-nums",
-      "Modelo " + pct(ev.model_prob) + "  ·  Mercado (justo) " + pct(ev.fair_market_prob) + "  ·  cuota " + fmtPrice(ev.decimal_odds)
-    ));
-    return row;
+  function verdictText(f){
+    if (f.pick === "Local") return "Gana " + f.home_team;
+    if (f.pick === "Visitante") return "Gana " + f.away_team;
+    return "Empate";
+  }
+  function card(f){
+    var c = el("article","fc");
+    var top = el("div","fc-top");
+    top.appendChild(el("div","teams", esc(f.home_team) + '<span class="vs">vs</span>' + esc(f.away_team)));
+    top.appendChild(el("div","when", fmtTime(f.commence_time)));
+    c.appendChild(top);
+
+    var v = el("div","verdict");
+    v.appendChild(el("span","pick", esc(verdictText(f))));
+    v.appendChild(el("span","pct", pct(+f.pick_prob)));
+    v.appendChild(el("span","conf " + f.confidence, "Confianza " + esc(f.confidence)));
+    c.appendChild(v);
+
+    var ph = +f.p_home, pd = f.p_draw != null ? +f.p_draw : 0, pa = +f.p_away;
+    var wrap = el("div");
+    var bar = el("div","bar");
+    bar.appendChild(el("span","h")).style.width = (ph*100) + "%";
+    if (pd) bar.appendChild(el("span","d")).style.width = (pd*100) + "%";
+    bar.appendChild(el("span","a")).style.width = (pa*100) + "%";
+    wrap.appendChild(bar);
+    var lab = el("div","bar-l");
+    lab.appendChild(el("span", null, '<span class="dot h"></span>Local <b>' + pct(ph) + '</b>'));
+    if (pd) lab.appendChild(el("span", null, '<span class="dot d"></span>Empate <b>' + pct(pd) + '</b>'));
+    lab.appendChild(el("span", null, '<span class="dot a"></span>Visitante <b>' + pct(pa) + '</b>'));
+    wrap.appendChild(lab);
+    c.appendChild(wrap);
+
+    var mk = el("div","mk"), n = 0;
+    if (f.over25 != null) { var o = +f.over25; mk.appendChild(el("span", null, (o >= .5 ? "Más" : "Menos") + " de 2,5 goles <b>" + pct(o >= .5 ? o : 1-o) + "</b>")); n++; }
+    if (f.btts != null) { var b = +f.btts; mk.appendChild(el("span", null, "Ambos anotan: " + (b >= .5 ? "Sí" : "No") + " <b>" + pct(b >= .5 ? b : 1-b) + "</b>")); n++; }
+    if (f.top_home != null) { mk.appendChild(el("span", null, "Marcador probable <b>" + f.top_home + "-" + f.top_away + "</b>")); n++; }
+    if (f.corners_exp != null) { var co = +f.corners_over95; mk.appendChild(el("span", null, "Córners ~<b>" + dec(f.corners_exp) + "</b> · " + (co >= .5 ? "más" : "menos") + " de 9,5 <b>" + pct(co >= .5 ? co : 1-co) + "</b>")); n++; }
+    if (f.cards_exp != null) { var ca = +f.cards_over45; mk.appendChild(el("span", null, "Tarjetas ~<b>" + dec(f.cards_exp) + "</b> · " + (ca >= .5 ? "más" : "menos") + " de 4,5 <b>" + pct(ca >= .5 ? ca : 1-ca) + "</b>")); n++; }
+    if (n) c.appendChild(mk);
+    var srcLabel = { "modelo + mercado":"Modelo + mercado", "modelo":"Solo modelo", "mercado":"Sin modelo para esta liga: probabilidad del mercado" }[f.source] || f.source;
+    c.appendChild(el("div","src", esc(srcLabel)));
+    return c;
   }
 
-  function renderMarketsPanel(panel, fx, marketsData){
-    panel.innerHTML = "";
-    var recs = marketsData.__recommendations || {};
-    var keys = Object.keys(marketsData || {}).filter(function(k){
-      return MARKET_LABELS[k] !== null && k.indexOf("__") !== 0 && marketsData[k] && marketsData[k].length;
-    });
-    if (!keys.length) {
-      var note = fx.sport === "soccer"
-        ? "Todavía no hay córners, tarjetas, goleador ni otros mercados publicados por las casas de apuestas para este partido — suelen aparecer pocos días antes del pitazo inicial."
-        : "Las casas de apuestas todavía no publican mercados adicionales para este partido.";
-      panel.appendChild(el("div", "markets-note", note));
-      return;
-    }
-
-    if (fx.sport === "soccer" && !marketsData.__modelUsed) {
-      panel.appendChild(el("div", "markets-note", "No tenemos fuerza de ataque/defensa calculada para uno de los dos equipos en esta liga (equipo nuevo o recién ascendido) — abajo solo se muestran las cuotas del mercado, sin pick del modelo."));
-    }
-
-    keys.sort(function(a,b){ return MARKET_ORDER.indexOf(a) - MARKET_ORDER.indexOf(b); });
-    keys.forEach(function(key){
-      var agg = aggregateOutcomes(marketsData[key]);
-      if (!agg.length) return;
-      if (key === "correct_score") {
-        agg.sort(function(a,b){ return a.avg - b.avg; });
-        agg = agg.slice(0, 6);
-      }
-      var block = el("div", "market-block");
-      block.appendChild(el("div", "m-title", MARKET_LABELS[key] || key));
-
-      if (key === "totals" && recs.totals) {
-        var t = recs.totals;
-        var best = t.over.is_value ? t.over : (t.under.is_value ? t.under : (t.most_likely === "Over" ? t.over : t.under));
-        var lbl = (best === t.over ? "Over " : "Under ") + t.line;
-        block.appendChild(pickRow(lbl, best));
-      } else if (key === "btts" && recs.btts) {
-        var b = recs.btts;
-        var bestB = b.yes.is_value ? b.yes : (b.no.is_value ? b.no : (b.most_likely === "Sí" ? b.yes : b.no));
-        block.appendChild(pickRow("Ambos anotan: " + (bestB === b.yes ? "Sí" : "No"), bestB));
-      } else if (key === "double_chance" && recs.double_chance) {
-        var dc = recs.double_chance;
-        var bestDc = dc.options.find(function(o){ return o.is_value; }) || dc.options.reduce(function(a,c){ return c.model_prob > a.model_prob ? c : a; });
-        block.appendChild(pickRow(bestDc.label, bestDc));
-      }
-
-      var row = el("div", "market-outcomes");
-      agg.forEach(function(o){
-        var chip = el("span", "m-outcome");
-        chip.appendChild(el("span", "nm", esc(o.label)));
-        chip.appendChild(el("span", "pr", fmtPrice(o.avg)));
-        row.appendChild(chip);
-      });
-      block.appendChild(row);
-      panel.appendChild(block);
-    });
-    panel.appendChild(el("div", "markets-note", "Cuotas promedio de casas europeas (" + (marketsData.__bookmakersSeen || "varias") + "), fila resaltada = lo que dice nuestro modelo Poisson vs. lo que realmente paga el mercado (cuota sin el margen de la casa) — no es el mismo libro que el 1X2 de arriba."));
+  function filtered(rows){
+    return rows.filter(function(f){ return (st.sport === "all" || f.sport === st.sport) && (st.conf === "all" || f.confidence === st.conf); });
   }
 
-  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-
-  async function toggleMarkets(fx, toggle, panel){
-    var isOpen = toggle.getAttribute("aria-expanded") === "true";
-    if (isOpen) {
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.querySelector(".lbl").textContent = "Ver más mercados";
-      panel.style.display = "none";
-      return;
-    }
-    toggle.setAttribute("aria-expanded", "true");
-    toggle.querySelector(".lbl").textContent = "Ocultar mercados";
-    panel.style.display = "flex";
-
-    if (state.marketsCache[fx.id]) {
-      renderMarketsPanel(panel, fx, state.marketsCache[fx.id]);
-      return;
-    }
-
-    panel.innerHTML = "";
-    var loading = el("div", "markets-loading", '<span class="spinner"></span><span>Consultando casas de apuestas…</span>');
-    panel.appendChild(loading);
-
-    // 1) ¿ya esta en cache fresco en la base? (barato, siempre se intenta primero)
-    var fresh = await runQuery(
-      "select markets, recommendations, model_used, status, error, bookmakers_seen from event_markets where fixture_id = " + (+fx.id) +
-      " and fetched_at > now() - interval '20 minutes';"
-    );
-    var row = (!fresh.error && fresh.rows && fresh.rows[0]) ? fresh.rows[0] : null;
-
-    if (!row) {
-      // 2) no hay nada fresco -> dispara el fetch en vivo (gasta cuota real del API)
-      var ANON_JWT = "<SUPABASE_ANON_KEY>";
-      await runQuery(
-        "select net.http_post(" +
-        "url := 'https://vritcqtzvvjwxmbmzsgy.supabase.co/functions/v1/get-event-markets'," +
-        "headers := jsonb_build_object('Content-Type','application/json','apikey','" + ANON_JWT + "','Authorization','Bearer " + ANON_JWT + "')," +
-        "body := jsonb_build_object('fixture_id', " + (+fx.id) + ")," +
-        "timeout_milliseconds := 25000);"
-      );
-      // 3) poll corto a la tabla hasta que el edge function termine de escribir
-      for (var i = 0; i < 8 && !row; i++) {
-        await sleep(1200);
-        var poll = await runQuery(
-          "select markets, recommendations, model_used, status, error, bookmakers_seen from event_markets where fixture_id = " + (+fx.id) +
-          " and fetched_at > now() - interval '2 minutes' order by fetched_at desc limit 1;"
-        );
-        if (!poll.error && poll.rows && poll.rows[0]) row = poll.rows[0];
-      }
-    }
-
-    if (!row) {
-      panel.innerHTML = "";
-      panel.appendChild(el("div", "markets-note", "No se pudo cargar a tiempo — vuelve a intentar en unos segundos."));
-      return;
-    }
-    if (row.status !== "ok") {
-      panel.innerHTML = "";
-      panel.appendChild(el("div", "markets-note", row.error || "Sin mercados adicionales para este partido."));
-      return;
-    }
-    var marketsData = row.markets || {};
-    marketsData.__bookmakersSeen = row.bookmakers_seen;
-    marketsData.__recommendations = row.recommendations || {};
-    marketsData.__modelUsed = row.model_used;
-    state.marketsCache[fx.id] = marketsData;
-    renderMarketsPanel(panel, fx, marketsData);
-  }
-
-  function esc(s){
-    return String(s).replace(/[&<>"']/g, function(c){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-    });
-  }
-
-  // Compartido entre "Proximos partidos" y "Resultados recientes" -- misma
-  // tarjeta (matchCard), mismo agrupado por liga, distinto origen de datos
-  // y distinto mensaje cuando no hay nada que mostrar.
-  function renderMatchList(opts){
-    var body = document.getElementById(opts.bodyId);
-    var meta = document.getElementById(opts.metaId);
-    if (opts.error) {
-      body.innerHTML = "";
-      var box = el("div", "state-box", errorCopy(opts.error.code));
-      box.appendChild(el("div", "fix", '<a href="https://claude.ai/settings/connectors" target="_blank" rel="noopener">Abrir Configuración → Conectores</a>'));
-      body.appendChild(box);
-      meta.textContent = "";
-      return;
-    }
-    if (!opts.rows) return; // still loading, skeleton stays
-
-    var rows = opts.rows.filter(function(fx){
-      return state.sport === "all" || fx.sport === state.sport;
-    });
-    meta.textContent = rows.length + (rows.length === 1 ? " partido" : " partidos");
+  function renderBoard(){
+    var body = document.getElementById("upBody"), meta = document.getElementById("upMeta");
+    if (st.boardErr) { body.innerHTML = ""; body.appendChild(errBox(st.boardErr.code)); meta.textContent = ""; return; }
+    if (!st.board) return;
+    var rows = filtered(st.board);
+    meta.textContent = rows.length + (rows.length === 1 ? " partido" : " partidos") + " · próximos 14 días";
     body.innerHTML = "";
-    if (!rows.length) {
-      body.appendChild(el("div", "state-box", opts.emptyMsg(state.sport)));
-      return;
-    }
-    var byLeague = {};
-    var order = [];
-    rows.forEach(function(fx){
-      if (!byLeague[fx.league]) { byLeague[fx.league] = []; order.push(fx.league); }
-      byLeague[fx.league].push(fx);
-    });
-    order.forEach(function(league){
-      var group = el("div", "league-group");
-      group.appendChild(el("div", "league-title", esc(league)));
-      byLeague[league].forEach(function(fx){ group.appendChild(matchCard(fx)); });
-      body.appendChild(group);
+    if (!rows.length) { body.appendChild(el("div","state-box","No hay partidos con ese filtro en los próximos 14 días.")); return; }
+    var days = {}, order = [];
+    rows.forEach(function(f){ var k = new Date(f.commence_time).toDateString(); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
+    order.forEach(function(k){
+      var day = el("div","day");
+      day.appendChild(el("div","day-title", esc(fmtDay(days[k][0].commence_time))));
+      var leagues = {}, lo = [];
+      days[k].forEach(function(f){ if (!leagues[f.league]) { leagues[f.league] = []; lo.push(f.league); } leagues[f.league].push(f); });
+      lo.forEach(function(L){
+        day.appendChild(el("div","league", esc(L)));
+        var g = el("div","grid");
+        leagues[L].forEach(function(f){ g.appendChild(card(f)); });
+        day.appendChild(g);
+      });
+      body.appendChild(day);
     });
   }
 
-  function renderFixtures(){
-    renderMatchList({
-      bodyId: "fixturesBody", metaId: "fixturesMeta",
-      error: state.fixturesError, rows: state.fixtures,
-      emptyMsg: function(sport){ return "No hay partidos próximos para " + (sport === "all" ? "ningún deporte" : sportLabel(sport).toLowerCase()) + " en este momento."; }
+  function renderAccuracy(){
+    var body = document.getElementById("accBody"), meta = document.getElementById("accMeta");
+    var s = st.summary;
+    if (!s) return;
+    body.innerHTML = "";
+    var n = +s.n || 0;
+    meta.textContent = n ? n + " pronósticos calificados" : "";
+    if (!n) {
+      body.appendChild(el("div","state-box", "Todavía no hay partidos terminados en el registro. " + (+s.logged ? s.logged + " pronósticos ya están guardados esperando resultado." : "El primero se guarda 3 horas antes del próximo partido.") + " Aquí verás el porcentaje real de aciertos."));
+      return;
+    }
+    var k = el("div","kpis");
+    function tile(l, hits, total, sub){
+      var t = el("div","kpi");
+      t.appendChild(el("div","l", esc(l)));
+      t.appendChild(el("div","v", total ? pct(hits/total) : "—"));
+      t.appendChild(el("div","s", total ? hits + " de " + total + (sub ? " · " + sub : "") : "sin datos todavía"));
+      return t;
+    }
+    k.appendChild(tile("Resultado (1X2)", +s.hit_result, n));
+    k.appendChild(tile("Más/menos 2,5 goles", +s.hit_over, +s.n_over));
+    k.appendChild(tile("Ambos anotan", +s.hit_btts, +s.n_btts));
+    k.appendChild(tile("Marcador exacto", +s.hit_score, +s.n_score, "es el más difícil"));
+    body.appendChild(k);
+    var row = el("div","conf-row");
+    [["alta","Confianza alta"],["media","Confianza media"],["baja","Confianza baja"]].forEach(function(c){
+      var tot = +s["n_" + c[0]], h = +s["h_" + c[0]];
+      row.appendChild(el("div","conf-item", '<span class="conf ' + c[0] + '">' + c[1] + '</span> ' + (tot ? '<b>' + pct(h/tot) + '</b> (' + h + ' de ' + tot + ')' : 'sin datos')));
     });
+    body.appendChild(row);
   }
 
   function renderResults(){
-    renderMatchList({
-      bodyId: "resultsBody", metaId: "resultsMeta",
-      error: state.resultsError, rows: state.results,
-      emptyMsg: function(sport){ return "No hay resultados recientes para " + (sport === "all" ? "ningún deporte" : sportLabel(sport).toLowerCase()) + " en los últimos 4 días."; }
-    });
-  }
-
-  function computeResultStats(finishedFixtures, picks){
-    // Modelo vs Mercado: para cada partido terminado que tenga con que
-    // comparar (modelo o cuota), se saca el favorito y si acerto -- mismo
-    // criterio que la insignia de cada tarjeta, pero agregado.
-    var bySport = {}; // sport -> {model:{w,l}, market:{w,l}}
-    finishedFixtures.forEach(function(fx){
-      if (fx.home_score == null || fx.away_score == null) return;
-      var d0 = deriveProbs(fx);
-      if (!d0.probs) return;
-      var homeWon = fx.home_score > fx.away_score, awayWon = fx.away_score > fx.home_score, draw = fx.home_score === fx.away_score;
-      var favSide = d0.probs.h >= d0.probs.a && d0.probs.h >= (d0.probs.d||0) ? "h" : (d0.probs.d && d0.probs.d >= d0.probs.a ? "d" : "a");
-      var hit = (favSide === "h" && homeWon) || (favSide === "a" && awayWon) || (favSide === "d" && draw);
-      var bucket = d0.hasModel ? "model" : "market";
-      if (!bySport[fx.sport]) bySport[fx.sport] = { model:{w:0,l:0}, market:{w:0,l:0} };
-      bySport[fx.sport][bucket][hit ? "w" : "l"]++;
-    });
-
-    // Picks formales: separa los antiguos (sin model_prob, de antes de
-    // picks_engine) de los nuevos (con probabilidad y edge reales), para no
-    // mezclar un historial que no viene del modelo con el que si.
-    var legacy = { w:0, l:0, pending:0 }, modeled = { w:0, l:0, pending:0 };
-    (picks||[]).forEach(function(p){
-      if (p.status === "no_pick" || p.status === "push" || p.status === "void") return;
-      var bucket = (p.model_prob != null) ? modeled : legacy;
-      if (p.status === "won") bucket.w++;
-      else if (p.status === "lost") bucket.l++;
-      else if (p.status === "pending") bucket.pending++;
-    });
-
-    // Por mercado: cada pronostico que el panel de un partido llego a
-    // mostrarle al usuario (haya tenido valor o no -- is_value solo marca
-    // cual de los dos fue), agrupado por tipo de mercado (se le quita la
-    // linea del final: "Goles totales 2.5" y "Goles totales 7.5" cuentan
-    // para el mismo renglon "Goles totales").
-    var byMarket = {};
-    (picks||[]).forEach(function(p){
-      if (p.status === "no_pick" || p.status === "push" || p.status === "void") return;
-      if (p.market == null) return;
-      var mtype = String(p.market).replace(/\s+[0-9]+(\.[0-9]+)?$/, "");
-      if (!byMarket[mtype]) byMarket[mtype] = { w:0, l:0, pending:0, valueW:0, valueL:0 };
-      var mb = byMarket[mtype];
-      if (p.status === "won") { mb.w++; if (p.is_value) mb.valueW++; }
-      else if (p.status === "lost") { mb.l++; if (p.is_value) mb.valueL++; }
-      else if (p.status === "pending") mb.pending++;
-    });
-
-    return { bySport: bySport, legacy: legacy, modeled: modeled, byMarket: byMarket };
-  }
-
-  function rateBar(w, total){
-    var pctV = total ? (w/total*100) : 0;
-    return '<span class="rate-bar"><span style="width:' + pctV.toFixed(0) + '%"></span></span>';
-  }
-
-  function kpiTile(label, value, sub, cls){
-    var t = el("div", "kpi-tile" + (cls ? " "+cls : ""));
-    t.appendChild(el("div", "kpi-label", label));
-    t.appendChild(el("div", "kpi-value", value));
-    if (sub) t.appendChild(el("div", "kpi-sub", sub));
-    return t;
-  }
-
-  function renderStats(){
-    var body = document.getElementById("statsBody");
-    var meta = document.getElementById("statsMeta");
-    if (state.statsError) {
-      body.innerHTML = "";
-      body.appendChild(el("div", "state-box", errorCopy(state.statsError.code)));
-      meta.textContent = "";
-      return;
-    }
-    if (!state.statsFixtures || !state.picksForStats) return;
-
-    var s = computeResultStats(state.statsFixtures, state.picksForStats);
+    var body = document.getElementById("resBody"), meta = document.getElementById("resMeta");
+    if (!st.results) return;
+    var rows = filtered(st.results);
     body.innerHTML = "";
-    meta.textContent = state.statsFixtures.length + " partidos terminados";
-
-    var modeledTotal = s.modeled.w + s.modeled.l;
-    var legacyTotal = s.legacy.w + s.legacy.l;
-
-    var kpis = el("div", "kpi-row");
-    kpis.appendChild(kpiTile(
-      "Picks del modelo nuevo",
-      modeledTotal ? pct(s.modeled.w / modeledTotal) : "—",
-      modeledTotal ? (s.modeled.w + "W - " + s.modeled.l + "L") + (s.modeled.pending ? " · " + s.modeled.pending + " pendientes" : "") : (s.modeled.pending + " pendientes, sin resultados todavía"),
-      modeledTotal && (s.modeled.w/modeledTotal) >= 0.5 ? "ok" : (modeledTotal ? "warn" : "")
-    ));
-    kpis.appendChild(kpiTile(
-      "Picks históricos (antes del modelo)",
-      legacyTotal ? pct(s.legacy.w / legacyTotal) : "—",
-      legacyTotal ? (s.legacy.w + "W - " + s.legacy.l + "L") + " · picks de papel sin probabilidad" : "sin datos",
-      legacyTotal && (s.legacy.w/legacyTotal) < 0.4 ? "warn" : ""
-    ));
-    var sportsWithData = Object.keys(s.bySport);
-    var totalModelW = 0, totalModelN = 0, totalMarketW = 0, totalMarketN = 0;
-    sportsWithData.forEach(function(sp){
-      totalModelW += s.bySport[sp].model.w; totalModelN += s.bySport[sp].model.w + s.bySport[sp].model.l;
-      totalMarketW += s.bySport[sp].market.w; totalMarketN += s.bySport[sp].market.w + s.bySport[sp].market.l;
+    meta.textContent = rows.length ? "últimos " + rows.length : "";
+    if (!rows.length) { body.appendChild(el("div","state-box","Aún no hay resultados calificados con ese filtro.")); return; }
+    var list = el("div","res-list");
+    rows.forEach(function(r){
+      var it = el("div","res");
+      it.appendChild(el("div", r.hit_result ? "mark-ok" : "mark-no", r.hit_result ? "✓" : "✗"));
+      var mid = el("div");
+      mid.appendChild(el("div","t", esc(r.home_team) + ' <span class="sc">' + r.home_score + "-" + r.away_score + "</span> " + esc(r.away_team)));
+      mid.appendChild(el("div","d", "Pronóstico: " + esc(verdictText(r)) + " " + pct(+r.pick_prob) + " · " + esc(r.league) + " · " + shortDate(r.commence_time)));
+      it.appendChild(mid);
+      it.appendChild(el("span","conf " + r.confidence, esc(r.confidence)));
+      list.appendChild(it);
     });
-    kpis.appendChild(kpiTile(
-      "Favorito del modelo acertó",
-      totalModelN ? pct(totalModelW/totalModelN) : "—",
-      totalModelN ? totalModelN + " partidos evaluados" : "sin partidos con modelo todavía"
-    ));
-    kpis.appendChild(kpiTile(
-      "Favorito del mercado acertó",
-      totalMarketN ? pct(totalMarketW/totalMarketN) : "—",
-      totalMarketN ? totalMarketN + " partidos evaluados" : "sin partidos sin modelo"
-    ));
-    body.appendChild(kpis);
-
-    if (sportsWithData.length) {
-      var block = el("div", "stats-block");
-      block.appendChild(el("h3", null, "Favorito acertó vs falló, por deporte"));
-      var table = el("table", "breakdown-table");
-      var thead = el("thead", null, "<tr><th>Deporte</th><th>Modelo</th><th>Mercado</th></tr>");
-      table.appendChild(thead);
-      var tbody = el("tbody");
-      sportsWithData.sort().forEach(function(sp){
-        var row = s.bySport[sp];
-        var mN = row.model.w + row.model.l, kN = row.market.w + row.market.l;
-        var tr = el("tr");
-        tr.appendChild(el("td", null, esc(sportLabel(sp))));
-        tr.appendChild(el("td", "num", mN ? (row.model.w + "-" + row.model.l + rateBar(row.model.w, mN)) : "—"));
-        tr.appendChild(el("td", "num", kN ? (row.market.w + "-" + row.market.l + rateBar(row.market.w, kN)) : "—"));
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-      block.appendChild(table);
-      body.appendChild(block);
-    }
-
-    var marketTypes = Object.keys(s.byMarket || {});
-    if (marketTypes.length) {
-      var mblock = el("div", "stats-block");
-      mblock.appendChild(el("h3", null, "Precisión por mercado"));
-      var mtable = el("table", "breakdown-table");
-      var mthead = el("thead", null, "<tr><th>Mercado</th><th>Resultado</th><th>Pendientes</th></tr>");
-      mtable.appendChild(mthead);
-      var mtbody = el("tbody");
-      marketTypes.sort(function(a,b){
-        var na = s.byMarket[a].w + s.byMarket[a].l, nb = s.byMarket[b].w + s.byMarket[b].l;
-        return nb - na;
-      }).forEach(function(mt){
-        var row = s.byMarket[mt];
-        var n = row.w + row.l;
-        var tr = el("tr");
-        tr.appendChild(el("td", null, esc(mt)));
-        var resultBits = n ? (row.w + "-" + row.l + rateBar(row.w, n) + " " + pct(row.w/n)) : "—";
-        if (n && row.valueW + row.valueL) resultBits += ' <span style="color:var(--text-faint)">(' + row.valueW + "-" + row.valueL + " de valor)</span>";
-        tr.appendChild(el("td", "num", resultBits));
-        tr.appendChild(el("td", "num", row.pending || "—"));
-        mtbody.appendChild(tr);
-      });
-      mtable.appendChild(mtbody);
-      mblock.appendChild(mtable);
-      mblock.appendChild(el("div", "stats-note", "Cada renglón es todo pronóstico que el panel de un partido llegó a mostrar en ese mercado (tenga valor o no) — \"de valor\" aparte cuenta solo los que además superaron el umbral de edge (≥3%). Córners y tarjetas quedan pendientes hasta que tengamos el marcador real de esos mercados, no solo el resultado del partido."));
-      body.appendChild(mblock);
-    }
-
-    body.appendChild(el("div", "stats-note",
-      "\"Modelo\" y \"Mercado\" nunca se mezclan: si ya calculamos probabilidad propia para un partido se evalúa esa, si no se evalúa el favorito implícito de la cuota — siempre se rotula cuál de los dos fue. Los picks históricos son de antes de construir picks_engine (sin probabilidad ni edge real); los del modelo nuevo recién empiezan a resolverse."
-    ));
+    body.appendChild(list);
   }
-
-  function pickCard(p){
-    var card = el("div", "pick-card");
-    card.appendChild(el("div", "pick-event", esc(p.event)));
-    var metaBits = [esc(p.league || sportLabel(p.sport))];
-    if (p.event_date) metaBits.push(new Date(p.event_date).toLocaleDateString("es-CO", {day:"2-digit", month:"short"}));
-    card.appendChild(el("div", "pick-meta", metaBits.join(" · ")));
-    var selBits = esc(p.selection);
-    if (p.decimal_odds) selBits += ' <span class="mono">@ ' + (+p.decimal_odds).toFixed(2) + "</span>";
-    card.appendChild(el("div", "pick-sel", selBits));
-    var badgeText = {pending:"Pendiente", won:"Acertó", lost:"Falló", push:"Push", void:"Anulado", no_pick:"Sin pick"}[p.status] || p.status;
-    card.appendChild(el("span", "badge " + p.status, badgeText));
-    if (p.model_prob != null && p.edge != null) {
-      card.appendChild(el("div", "pick-result", "Modelo " + pct(+p.model_prob) + "  ·  edge " + (p.edge >= 0 ? "+" : "") + (+p.edge*100).toFixed(1) + "%"));
-    } else if (p.result_note) {
-      card.appendChild(el("div", "pick-result", esc(p.result_note)));
-    }
-    return card;
-  }
-
-  function renderPicks(){
-    var body = document.getElementById("picksBody");
-    var meta = document.getElementById("picksMeta");
-    if (state.picksError) {
-      body.innerHTML = "";
-      body.appendChild(el("div", "state-box", errorCopy(state.picksError.code)));
-      meta.textContent = "";
-      return;
-    }
-    if (!state.picks) return;
-    meta.textContent = state.picks.length;
-    body.innerHTML = "";
-    if (!state.picks.length) {
-      body.appendChild(el("div", "state-box", "Todavía no hay picks registrados."));
-      return;
-    }
-    state.picks.forEach(function(p){ body.appendChild(pickCard(p)); });
-  }
-
-
-  // ---------------- Buscador de cuotas ----------------
-  var finder = { opps:null, fixtures:null, error:null, refreshing:false };
-  function evPct(v){ return (v>=0?"+":"") + (v*100).toFixed(1) + "%"; }
-  function ago(iso){
-    if (!iso) return "";
-    var m = Math.round((Date.now() - new Date(iso).getTime())/60000);
-    if (m < 60) return "hace " + m + " min";
-    var h = Math.round(m/60); return h < 48 ? "hace " + h + " h" : "hace " + Math.round(h/24) + " días";
-  }
-  function renderFinder(){
-    var body = document.getElementById("finderBody"), meta = document.getElementById("finderMeta");
-    if (finder.error) { body.innerHTML = ""; body.appendChild(el("div","state-box", errorCopy(finder.error.code))); return; }
-    if (!finder.opps) return;
-    body.innerHTML = "";
-    meta.textContent = finder.opps.length ? finder.opps.length + " oportunidades" : "";
-    if (!finder.opps.length) {
-      body.appendChild(el("div","state-box","Ninguna casa paga hoy más que el precio justo de Pinnacle (≥ 2%). Es lo normal la mayoría del tiempo — actualiza más cerca de los partidos."));
-      return;
-    }
-    finder.opps.forEach(function(o){
-      var c = el("div","opp-card");
-      c.appendChild(el("div", null, '<div class="teams">' + esc(o.home_team) + '<span class="vs">vs</span>' + esc(o.away_team) + '</div><div class="sub">' + esc(o.league) + ' · ' + fmtWhen(o.commence_time) + '</div>'));
-      c.appendChild(el("div","ev", evPct(+o.ev)));
-      c.appendChild(el("div","sel", esc(o.outcome) + ' en <b>' + esc(o.bookmaker) + '</b> a <b>' + (+o.price).toFixed(2) + '</b> · justa ' + (+o.fair_odds).toFixed(2)));
-      c.appendChild(el("div","sub", ago(o.last_update)));
-      body.appendChild(c);
-    });
-  }
-  function renderCalc(){
-    var sel = document.getElementById("calcFixture");
-    if (!finder.fixtures) return;
-    var prev = sel.value;
-    sel.innerHTML = "";
-    if (!finder.fixtures.length) { sel.appendChild(new Option("Sin partidos con precio justo — pulsa Actualizar cuotas","")); renderCalcGrid(); return; }
-    sel.appendChild(new Option("Elige un partido…",""));
-    finder.fixtures.forEach(function(f){
-      sel.appendChild(new Option(f.home_team + " vs " + f.away_team + " — " + f.league + " · " + fmtWhen(f.commence_time), String(f.id)));
-    });
-    if (prev) sel.value = prev;
-    renderCalcGrid();
-  }
-  function renderCalcGrid(){
-    var grid = document.getElementById("calcGrid"), warn = document.getElementById("calcWarn");
-    var id = document.getElementById("calcFixture").value;
-    grid.innerHTML = ""; warn.textContent = "";
-    var f = (finder.fixtures||[]).find(function(x){ return String(x.id) === id; });
-    if (!f) return;
-    var outs = [["Local", f.fair_home], ["Empate", f.fair_draw], ["Visitante", f.fair_away]].filter(function(o){ return o[1] != null; });
-    outs.forEach(function(o){
-      var fair = +o[1], fairOdds = 1/fair, minOdds = fairOdds * 1.02;
-      var cell = el("div","calc-cell");
-      cell.appendChild(el("div","lbl", o[0]));
-      var inp = document.createElement("input");
-      inp.type = "number"; inp.step = "0.01"; inp.min = "1.01"; inp.inputMode = "decimal";
-      inp.placeholder = "Cuota de tu casa"; inp.setAttribute("aria-label", "Cuota " + o[0]);
-      cell.appendChild(inp);
-      cell.appendChild(el("div","fair", "Justa " + fairOdds.toFixed(2) + " · con valor desde " + minOdds.toFixed(2)));
-      var res = el("div","res");
-      cell.appendChild(res);
-      inp.addEventListener("input", function(){
-        var p = parseFloat(String(inp.value).replace(",", "."));
-        if (!(p > 1)) { res.textContent = ""; res.className = "res"; return; }
-        var ev = p * fair - 1;
-        res.textContent = "Valor esperado " + evPct(ev) + (ev >= 0.02 ? " — vale la pena" : ev >= 0 ? " — casi nada" : " — no conviene");
-        res.className = "res " + (ev >= 0.02 ? "pos" : "neg");
-      });
-      grid.appendChild(cell);
-    });
-    var hrs = (Date.now() - new Date(f.fair_updated_at).getTime())/3600000;
-    if (hrs > 6) warn.textContent = "El precio justo es de " + ago(f.fair_updated_at) + ". Pulsa Actualizar cuotas antes de decidir.";
-  }
-  async function loadFinder(){
-    var op = await runQuery(
-      "select fixture_id, league, home_team, away_team, commence_time, outcome, bookmaker, price, fair_odds, ev, last_update " +
-      "from value_opportunities where ev >= 0.02 order by ev desc limit 50;"
-    );
-    if (op.error) finder.error = op.error; else finder.opps = op.rows;
-    renderFinder();
-    var fx = await runQuery(
-      "select id, league, home_team, away_team, commence_time, fair_home, fair_draw, fair_away, fair_updated_at " +
-      "from fixtures where status = 'scheduled' and commence_time > now() and fair_source = 'pinnacle' " +
-      "order by commence_time limit 200;"
-    );
-    if (!fx.error) { finder.fixtures = fx.rows; renderCalc(); }
-    var last = (finder.fixtures||[]).reduce(function(m,f){ return !m || f.fair_updated_at > m ? f.fair_updated_at : m; }, null);
-    if (last && !finder.refreshing) document.getElementById("finderStatus").textContent = "Cuotas actualizadas " + ago(last);
-  }
-  async function refreshOdds(){
-    if (finder.refreshing) return;
-    var btn = document.getElementById("refreshOddsBtn"), st = document.getElementById("finderStatus");
-    finder.refreshing = true; btn.disabled = true; st.textContent = "Consultando casas de apuestas…";
-    var ANON = "<SUPABASE_ANON_KEY>";
-    var req = await runQuery(
-      "select net.http_post(url := 'https://vritcqtzvvjwxmbmzsgy.supabase.co/functions/v1/refresh-odds'," +
-      "headers := jsonb_build_object('Content-Type','application/json','apikey','" + ANON + "','Authorization','Bearer " + ANON + "')," +
-      "body := jsonb_build_object('sport','soccer','hours',168), timeout_milliseconds := 120000) as id;"
-    );
-    var reqId = (!req.error && req.rows && req.rows[0]) ? +req.rows[0].id : null;
-    var summary = null;
-    for (var i = 0; i < 25 && reqId && !summary; i++) {
-      await sleep(2000);
-      var r = await runQuery("select status_code, content from net._http_response where id = " + reqId + ";");
-      if (!r.error && r.rows && r.rows[0]) { try { summary = JSON.parse(r.rows[0].content); } catch(e){ summary = { ok:false }; } }
-    }
-    finder.refreshing = false; btn.disabled = false;
-    if (!summary) { st.textContent = "No respondió a tiempo — intenta de nuevo en un minuto."; return; }
-    if (!summary.ok) { st.textContent = "No se pudo actualizar."; return; }
-    st.textContent = "Listo: " + summary.withPinnacle + " partidos con precio justo · créditos restantes de la API: " + (summary.creditsRemaining ?? "?");
-    await loadFinder();
-  }
-  document.getElementById("refreshOddsBtn").addEventListener("click", refreshOdds);
-  document.getElementById("calcFixture").addEventListener("change", renderCalcGrid);
 
   async function load(){
     renderFilters();
-    loadFinder();
-    var fx = await runQuery(
-      "select id, sport, league, home_team, away_team, commence_time, status, " +
-      "home_score, away_score, odds_home, odds_draw, odds_away, " +
-      "model_prob_home, model_prob_draw, model_prob_away, external_id " +
-      "from fixtures where status = 'scheduled' " +
-      "order by commence_time limit 250;"
+    var b = await runQuery(
+      "select fixture_id, sport, league, home_team, away_team, commence_time, source, p_home, p_draw, p_away, pick, pick_prob, confidence, " +
+      "over25, btts, top_home, top_away, corners_exp, corners_over95, cards_exp, cards_over45 " +
+      "from forecast_board order by commence_time limit 400;"
     );
-    if (fx.error) state.fixturesError = fx.error; else state.fixtures = fx.rows;
-    renderFixtures();
+    if (b.error) st.boardErr = b.error; else st.board = b.rows;
+    renderBoard();
 
-    // Resultados recientes -- separado de "Proximos partidos" (esa lista
-    // ahora solo trae 'scheduled'): partidos ya jugados en los ultimos 4
-    // dias, incluyendo los que no generaron ningun pick formal (el modelo
-    // no vio valor), para no perder de vista que pasaron.
-    var rs = await runQuery(
-      "select id, sport, league, home_team, away_team, commence_time, status, " +
-      "home_score, away_score, odds_home, odds_draw, odds_away, " +
-      "model_prob_home, model_prob_draw, model_prob_away, external_id " +
-      "from fixtures where status = 'finished' and home_score is not null and away_score is not null " +
-      "and commence_time > now() - interval '4 days' " +
-      "order by commence_time desc limit 100;"
+    var s = await runQuery(
+      "select count(*) n, count(*) filter (where hit_result) hit_result, " +
+      "count(hit_over25) n_over, count(*) filter (where hit_over25) hit_over, " +
+      "count(hit_btts) n_btts, count(*) filter (where hit_btts) hit_btts, " +
+      "count(hit_score) n_score, count(*) filter (where hit_score) hit_score, " +
+      "count(*) filter (where confidence='alta') n_alta, count(*) filter (where confidence='alta' and hit_result) h_alta, " +
+      "count(*) filter (where confidence='media') n_media, count(*) filter (where confidence='media' and hit_result) h_media, " +
+      "count(*) filter (where confidence='baja') n_baja, count(*) filter (where confidence='baja' and hit_result) h_baja, " +
+      "(select count(*) from forecast_log) logged from forecast_results;"
     );
-    if (rs.error) state.resultsError = rs.error; else state.results = rs.rows;
-    renderResults();
+    if (s.error) { document.getElementById("accBody").innerHTML = ""; document.getElementById("accBody").appendChild(errBox(s.error.code)); }
+    else { st.summary = (s.rows && s.rows[0]) || { n:0 }; renderAccuracy(); }
 
-    var pk = await runQuery(
-      "select id, sport, league, event, event_date, market, selection, decimal_odds, " +
-      "model_prob, edge, is_value, status, result_note from picks " +
-      "order by (status = 'pending') desc, created_at desc limit 25;"
+    var r = await runQuery(
+      "select fixture_id, sport, league, home_team, away_team, commence_time, pick, pick_prob, confidence, home_score, away_score, hit_result " +
+      "from forecast_results order by commence_time desc limit 40;"
     );
-    if (pk.error) state.picksError = pk.error; else state.picks = pk.rows;
-    renderPicks();
+    if (r.error) { document.getElementById("resBody").innerHTML = ""; document.getElementById("resBody").appendChild(errBox(r.error.code)); }
+    else { st.results = r.rows; renderResults(); }
 
-    // Partidos terminados para el tablero "Como vamos" -- ventana mas amplia
-    // que la de "Proximos partidos" (esa se queda en 4 dias para no saturar
-    // la vista), aca queremos todo el historial resuelto que haya.
-    var st = await runQuery(
-      "select sport, home_team, away_team, home_score, away_score, " +
-      "odds_home, odds_draw, odds_away, model_prob_home, model_prob_draw, model_prob_away " +
-      "from fixtures where status='finished' and home_score is not null and away_score is not null " +
-      "order by commence_time desc limit 500;"
-    );
-    if (st.error) state.statsError = st.error; else state.statsFixtures = st.rows;
-
-    // Consulta aparte (mas amplia que las 25 de "Mis picks", que solo es
-    // para mostrar las recientes) -- "Como vamos" necesita el historial
-    // completo de pronosticos para no subestimar el conteo por mercado.
-    var pkStats = await runQuery(
-      "select market, is_value, model_prob, status from picks " +
-      "where status in ('won','lost','pending') order by created_at desc limit 2000;"
-    );
-    if (!pkStats.error) state.picksForStats = pkStats.rows;
-    else if (!state.statsError) state.statsError = pkStats.error;
-    renderStats();
+    var q = await runQuery("select remaining, updated_at from api_quota where api = 'the-odds-api';");
+    if (!q.error && q.rows && q.rows[0]) {
+      var rem = +q.rows[0].remaining, box = document.getElementById("quota");
+      box.textContent = "Créditos de The Odds API: " + rem + " de 500 · actualizado " + new Date(q.rows[0].updated_at).toLocaleString("es-CO", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
+      if (rem < 80) box.className = "quota low";
+    }
   }
-
   load();
 })();
 </script>
