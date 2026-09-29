@@ -94,5 +94,9 @@ Deno.serve(async (req: Request) => {
       summary.errors.push(`${key}: ${String(e).slice(0, 120)}`);
     }
   }
+  // Guarda los creditos restantes: schedule_odds_refresh() se detiene solo si bajan de 80.
+  if (summary.creditsRemaining != null) {
+    await supabase.from("api_quota").upsert({ api: "the-odds-api", remaining: parseInt(summary.creditsRemaining, 10), updated_at: new Date().toISOString() });
+  }
   return new Response(JSON.stringify(summary, null, 1), { headers: { "Content-Type": "application/json" } });
 });
