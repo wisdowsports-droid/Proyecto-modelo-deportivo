@@ -42,6 +42,7 @@ const SOCCER_WHITELIST = [
   "soccer_usa_mls",
   "soccer_conmebol_copa_libertadores",
   "soccer_conmebol_copa_sudamericana",
+  "soccer_uefa_nations_league", // selecciones (agregada 2026-09-28)
 ];
 const BASKETBALL_WHITELIST = ["basketball_nba", "basketball_wnba"];
 
@@ -67,7 +68,7 @@ interface FixtureRow {
   odds_api_sport_key: string;
 }
 
-async function fetchOddsApiFixtures(): Promise<{ rows: FixtureRow[]; errors: string[] }> {
+async function fetchOddsApiFixtures(onlyKeys: string[] | null = null): Promise<{ rows: FixtureRow[]; errors: string[] }> {
   const rows: FixtureRow[] = [];
   const errors: string[] = [];
   if (!ODDS_API_KEY) {
@@ -92,9 +93,14 @@ async function fetchOddsApiFixtures(): Promise<{ rows: FixtureRow[]; errors: str
     else if (s.group === "Tennis") selected.push(s);
   }
 
-  for (const sportInfo of selected) {
+  // body opcional { only_keys: [...] }: sincroniza solo esas ligas (1 credito c/u).
+  const toFetch = onlyKeys ? selected.filter((x) => onlyKeys.includes(x.key)) : selected;
+  for (const sportInfo of toFetch) {
     try {
-      const url = `https://api.the-odds-api.com/v4/sports/${sportInfo.key}/odds/?apiKey=${ODDS_API_KEY}&regions=us&markets=h2h&oddsFormat=decimal`;
+      // Futbol: region eu (trae Pinnacle y casas europeas, cubre selecciones);
+      // resto: us. Sigue costando 1 credito por liga.
+      const region = sportInfo.group === "Soccer" ? "eu" : "us";
+      const url = `https://api.the-odds-api.com/v4/sports/${sportInfo.key}/odds/?apiKey=${ODDS_API_KEY}&regions=${region}&markets=h2h&oddsFormat=decimal`;
       const res = await fetch(url);
       if (!res.ok) {
         errors.push(`the-odds-api ${sportInfo.key} failed: ${res.status}`);
@@ -103,7 +109,7 @@ async function fetchOddsApiFixtures(): Promise<{ rows: FixtureRow[]; errors: str
       const events: any[] = await res.json();
       const sportSlug = GROUP_TO_SPORT[sportInfo.group] ?? "soccer";
       for (const ev of events) {
-        const book = ev.bookmakers?.[0];
+        const book = ev.bookmakers?.find((bm: any) => bm.key === "pinnacle") ?? ev.bookmakers?.[0];
         const market = book?.markets?.find((m: any) => m.key === "h2h");
         let oddsHome: number | null = null;
         let oddsDraw: number | null = null;
@@ -225,10 +231,12 @@ async function fetchApiFootballColombia(): Promise<{ rows: FixtureRow[]; errors:
   return { rows, errors };
 }
 
-Deno.serve(async (_req: Request) => {
+Deno.serve(async (req: Request) => {
+  let onlyKeys: string[] | null = null;
+  try { const body = await req.json(); if (Array.isArray(body?.only_keys) && body.only_keys.length) onlyKeys = body.only_keys; } catch (_e) { /* sin body */ }
   const [oddsApiResult, apiFootballResult] = await Promise.all([
-    fetchOddsApiFixtures(),
-    fetchApiFootballColombia(),
+    fetchOddsApiFixtures(onlyKeys),
+    onlyKeys ? Promise.resolve({ rows: [] as FixtureRow[], errors: [] as string[] }) : fetchApiFootballColombia(),
   ]);
 
   const allRows = [...oddsApiResult.rows, ...apiFootballResult.rows];

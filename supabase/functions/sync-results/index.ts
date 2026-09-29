@@ -37,6 +37,7 @@ const SOCCER_WHITELIST = [
   "soccer_epl", "soccer_spain_la_liga", "soccer_italy_serie_a", "soccer_germany_bundesliga",
   "soccer_france_ligue_one", "soccer_uefa_champs_league", "soccer_uefa_champs_league_women",
   "soccer_usa_mls", "soccer_conmebol_copa_libertadores", "soccer_conmebol_copa_sudamericana",
+  "soccer_uefa_nations_league", // selecciones (agregada 2026-09-28)
 ];
 const BASKETBALL_WHITELIST = ["basketball_nba", "basketball_wnba"];
 
