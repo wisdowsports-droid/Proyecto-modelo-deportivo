@@ -33,7 +33,12 @@ const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
 const CACHE_TTL_MINUTES = 20;
 const NEAR_KICKOFF_DAYS = 4;
-const VALUE_THRESHOLD = 0.03;
+// Desactivado el 2026-09-28: el backtest walk-forward (~70.000 partidos, 30
+// ligas, ver supabase/functions/backtest-soccer) mostro que las "ventajas"
+// del modelo contra el mercado no son reales: los picks marcados con valor
+// perdian entre 5% y 20%. Con umbral 1.0 ningun pick se marca is_value; el
+// panel sigue mostrando la probabilidad del modelo y la del mercado.
+const VALUE_THRESHOLD = 1.0;
 const KELLY_MULTIPLIER = 0.25;
 
 const SOCCER_CORE = ["h2h", "totals", "btts", "double_chance", "draw_no_bet", "totals_h1", "btts_h1", "correct_score"];

@@ -1,4 +1,3 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Kinetik Picks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,6 +199,30 @@
   .stats-note{font-size:11.5px; color:var(--text-faint); margin-top:10px}
   .stats-block{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:12px}
   .stats-block h3{font-size:13px; margin-bottom:8px}
+
+  /* ---- Buscador de cuotas ---- */
+  #finderSection{margin-bottom:22px}
+  .finder-bar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px}
+  .btn{padding:8px 14px; border-radius:999px; border:1px solid var(--accent); background:var(--accent); color:#04140D; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit}
+  .btn[disabled]{opacity:.55; cursor:wait}
+  .btn.ghost{background:var(--surface); color:var(--accent-strong)}
+  .finder-status{font-size:12px; color:var(--text-muted)}
+  .opp-card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 14px; margin-bottom:8px; display:grid; grid-template-columns:1fr auto; gap:4px 12px; align-items:center}
+  .opp-card .ev{font-family:"JetBrains Mono",monospace; font-weight:800; font-size:15px; color:var(--accent-strong); text-align:right}
+  .opp-card .sub{font-size:11.5px; color:var(--text-faint)}
+  .opp-card .sel{font-size:13px; color:var(--text-muted)}
+  .opp-card .sel b{color:var(--text); font-family:"JetBrains Mono",monospace}
+  .calc{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px}
+  .calc h3{font-size:13px; margin-bottom:8px}
+  .calc select, .calc input{width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font:inherit; font-size:13px}
+  .calc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px}
+  .calc-cell{background:var(--surface-2); border-radius:8px; padding:8px}
+  .calc-cell .lbl{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px}
+  .calc-cell .fair{font-size:11.5px; color:var(--text-muted); margin-top:5px; font-family:"JetBrains Mono",monospace}
+  .calc-cell .res{font-size:12px; font-weight:700; margin-top:4px; font-family:"JetBrains Mono",monospace}
+  .calc-cell .res.pos{color:var(--accent-strong)} .calc-cell .res.neg{color:var(--danger)}
+  .warn-line{font-size:12px; color:var(--danger); margin-top:8px}
+  @media (max-width:520px){ .calc-grid{grid-template-columns:1fr} }
 </style>
 
 <header class="top">
@@ -217,6 +240,25 @@
   </div>
   <div class="filters" id="filters" role="tablist" aria-label="Filtrar por deporte"></div>
 </header>
+
+<section id="finderSection">
+  <div class="section-head">
+    <h2>Buscador de cuotas</h2>
+    <span class="meta" id="finderMeta"></span>
+  </div>
+  <p class="note">Precio justo = cuota de Pinnacle sin margen. Aquí aparecen las casas que pagan más que ese precio (valor esperado ≥ 2%). En el backtest (~75.000 partidos) apostar así dio ganancia; con el modelo propio, no. Revisa la cuota en tu casa antes de apostar: cambian rápido.</p>
+  <div class="finder-bar">
+    <button class="btn" id="refreshOddsBtn" type="button">Actualizar cuotas (fútbol, próx. 7 días)</button>
+    <span class="finder-status" id="finderStatus"></span>
+  </div>
+  <div id="finderBody"><div class="skel" style="height:120px"></div></div>
+  <div class="calc" id="calcBox" style="margin-top:12px">
+    <h3>Calculadora para Betplay, Rushbet u otra casa</h3>
+    <select id="calcFixture" aria-label="Partido"><option value="">Cargando partidos…</option></select>
+    <div class="calc-grid" id="calcGrid"></div>
+    <div class="warn-line" id="calcWarn"></div>
+  </div>
+</section>
 
 <section class="stats-section" id="statsSection">
   <div class="section-head">
@@ -254,7 +296,7 @@
   </aside>
 </main>
 
-<footer>Datos del modelo propio (Poisson/Elo) sobre cuotas de mercado — no es asesoría de apuestas.</footer>
+<footer>Probabilidades del modelo propio (Poisson/Elo) y precio justo de Pinnacle — no es asesoría de apuestas.</footer>
 
 <script>
 (function(){
@@ -873,8 +915,123 @@
     state.picks.forEach(function(p){ body.appendChild(pickCard(p)); });
   }
 
+
+  // ---------------- Buscador de cuotas ----------------
+  var finder = { opps:null, fixtures:null, error:null, refreshing:false };
+  function evPct(v){ return (v>=0?"+":"") + (v*100).toFixed(1) + "%"; }
+  function ago(iso){
+    if (!iso) return "";
+    var m = Math.round((Date.now() - new Date(iso).getTime())/60000);
+    if (m < 60) return "hace " + m + " min";
+    var h = Math.round(m/60); return h < 48 ? "hace " + h + " h" : "hace " + Math.round(h/24) + " días";
+  }
+  function renderFinder(){
+    var body = document.getElementById("finderBody"), meta = document.getElementById("finderMeta");
+    if (finder.error) { body.innerHTML = ""; body.appendChild(el("div","state-box", errorCopy(finder.error.code))); return; }
+    if (!finder.opps) return;
+    body.innerHTML = "";
+    meta.textContent = finder.opps.length ? finder.opps.length + " oportunidades" : "";
+    if (!finder.opps.length) {
+      body.appendChild(el("div","state-box","Ninguna casa paga hoy más que el precio justo de Pinnacle (≥ 2%). Es lo normal la mayoría del tiempo — actualiza más cerca de los partidos."));
+      return;
+    }
+    finder.opps.forEach(function(o){
+      var c = el("div","opp-card");
+      c.appendChild(el("div", null, '<div class="teams">' + esc(o.home_team) + '<span class="vs">vs</span>' + esc(o.away_team) + '</div><div class="sub">' + esc(o.league) + ' · ' + fmtWhen(o.commence_time) + '</div>'));
+      c.appendChild(el("div","ev", evPct(+o.ev)));
+      c.appendChild(el("div","sel", esc(o.outcome) + ' en <b>' + esc(o.bookmaker) + '</b> a <b>' + (+o.price).toFixed(2) + '</b> · justa ' + (+o.fair_odds).toFixed(2)));
+      c.appendChild(el("div","sub", ago(o.last_update)));
+      body.appendChild(c);
+    });
+  }
+  function renderCalc(){
+    var sel = document.getElementById("calcFixture");
+    if (!finder.fixtures) return;
+    var prev = sel.value;
+    sel.innerHTML = "";
+    if (!finder.fixtures.length) { sel.appendChild(new Option("Sin partidos con precio justo — pulsa Actualizar cuotas","")); renderCalcGrid(); return; }
+    sel.appendChild(new Option("Elige un partido…",""));
+    finder.fixtures.forEach(function(f){
+      sel.appendChild(new Option(f.home_team + " vs " + f.away_team + " — " + f.league + " · " + fmtWhen(f.commence_time), String(f.id)));
+    });
+    if (prev) sel.value = prev;
+    renderCalcGrid();
+  }
+  function renderCalcGrid(){
+    var grid = document.getElementById("calcGrid"), warn = document.getElementById("calcWarn");
+    var id = document.getElementById("calcFixture").value;
+    grid.innerHTML = ""; warn.textContent = "";
+    var f = (finder.fixtures||[]).find(function(x){ return String(x.id) === id; });
+    if (!f) return;
+    var outs = [["Local", f.fair_home], ["Empate", f.fair_draw], ["Visitante", f.fair_away]].filter(function(o){ return o[1] != null; });
+    outs.forEach(function(o){
+      var fair = +o[1], fairOdds = 1/fair, minOdds = fairOdds * 1.02;
+      var cell = el("div","calc-cell");
+      cell.appendChild(el("div","lbl", o[0]));
+      var inp = document.createElement("input");
+      inp.type = "number"; inp.step = "0.01"; inp.min = "1.01"; inp.inputMode = "decimal";
+      inp.placeholder = "Cuota de tu casa"; inp.setAttribute("aria-label", "Cuota " + o[0]);
+      cell.appendChild(inp);
+      cell.appendChild(el("div","fair", "Justa " + fairOdds.toFixed(2) + " · con valor desde " + minOdds.toFixed(2)));
+      var res = el("div","res");
+      cell.appendChild(res);
+      inp.addEventListener("input", function(){
+        var p = parseFloat(String(inp.value).replace(",", "."));
+        if (!(p > 1)) { res.textContent = ""; res.className = "res"; return; }
+        var ev = p * fair - 1;
+        res.textContent = "Valor esperado " + evPct(ev) + (ev >= 0.02 ? " — vale la pena" : ev >= 0 ? " — casi nada" : " — no conviene");
+        res.className = "res " + (ev >= 0.02 ? "pos" : "neg");
+      });
+      grid.appendChild(cell);
+    });
+    var hrs = (Date.now() - new Date(f.fair_updated_at).getTime())/3600000;
+    if (hrs > 6) warn.textContent = "El precio justo es de " + ago(f.fair_updated_at) + ". Pulsa Actualizar cuotas antes de decidir.";
+  }
+  async function loadFinder(){
+    var op = await runQuery(
+      "select fixture_id, league, home_team, away_team, commence_time, outcome, bookmaker, price, fair_odds, ev, last_update " +
+      "from value_opportunities where ev >= 0.02 order by ev desc limit 50;"
+    );
+    if (op.error) finder.error = op.error; else finder.opps = op.rows;
+    renderFinder();
+    var fx = await runQuery(
+      "select id, league, home_team, away_team, commence_time, fair_home, fair_draw, fair_away, fair_updated_at " +
+      "from fixtures where status = 'scheduled' and commence_time > now() and fair_source = 'pinnacle' " +
+      "order by commence_time limit 200;"
+    );
+    if (!fx.error) { finder.fixtures = fx.rows; renderCalc(); }
+    var last = (finder.fixtures||[]).reduce(function(m,f){ return !m || f.fair_updated_at > m ? f.fair_updated_at : m; }, null);
+    if (last && !finder.refreshing) document.getElementById("finderStatus").textContent = "Cuotas actualizadas " + ago(last);
+  }
+  async function refreshOdds(){
+    if (finder.refreshing) return;
+    var btn = document.getElementById("refreshOddsBtn"), st = document.getElementById("finderStatus");
+    finder.refreshing = true; btn.disabled = true; st.textContent = "Consultando casas de apuestas…";
+    var ANON = "<SUPABASE_ANON_KEY>";
+    var req = await runQuery(
+      "select net.http_post(url := 'https://vritcqtzvvjwxmbmzsgy.supabase.co/functions/v1/refresh-odds'," +
+      "headers := jsonb_build_object('Content-Type','application/json','apikey','" + ANON + "','Authorization','Bearer " + ANON + "')," +
+      "body := jsonb_build_object('sport','soccer','hours',168), timeout_milliseconds := 120000) as id;"
+    );
+    var reqId = (!req.error && req.rows && req.rows[0]) ? +req.rows[0].id : null;
+    var summary = null;
+    for (var i = 0; i < 25 && reqId && !summary; i++) {
+      await sleep(2000);
+      var r = await runQuery("select status_code, content from net._http_response where id = " + reqId + ";");
+      if (!r.error && r.rows && r.rows[0]) { try { summary = JSON.parse(r.rows[0].content); } catch(e){ summary = { ok:false }; } }
+    }
+    finder.refreshing = false; btn.disabled = false;
+    if (!summary) { st.textContent = "No respondió a tiempo — intenta de nuevo en un minuto."; return; }
+    if (!summary.ok) { st.textContent = "No se pudo actualizar."; return; }
+    st.textContent = "Listo: " + summary.withPinnacle + " partidos con precio justo · créditos restantes de la API: " + (summary.creditsRemaining ?? "?");
+    await loadFinder();
+  }
+  document.getElementById("refreshOddsBtn").addEventListener("click", refreshOdds);
+  document.getElementById("calcFixture").addEventListener("change", renderCalcGrid);
+
   async function load(){
     renderFilters();
+    loadFinder();
     var fx = await runQuery(
       "select id, sport, league, home_team, away_team, commence_time, status, " +
       "home_score, away_score, odds_home, odds_draw, odds_away, " +
@@ -934,5 +1091,3 @@
   load();
 })();
 </script>
-
-</body></html>
