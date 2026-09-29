@@ -43,6 +43,12 @@ const SOCCER_WHITELIST = [
   "soccer_conmebol_copa_libertadores",
   "soccer_conmebol_copa_sudamericana",
   "soccer_uefa_nations_league", // selecciones (agregada 2026-09-28)
+  // Vueltas a agregar 2026-09-29: el modelo ya tiene su historial actualizado
+  // (sync-history-football-data-new) y se califican gratis desde ese historial.
+  // Solo gastan credito cuando tienen partidos en los proximos 10 dias.
+  "soccer_argentina_primera_division",
+  "soccer_brazil_campeonato",
+  "soccer_mexico_ligamx",
 ];
 const BASKETBALL_WHITELIST = ["basketball_nba", "basketball_wnba"];
 
