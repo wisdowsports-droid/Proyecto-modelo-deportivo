@@ -122,6 +122,25 @@
   footer{padding-block:12px 0; text-align:center; font-size:11.5px; color:var(--text-faint); display:flex; flex-direction:column; gap:6px; align-items:center}
   .quota{font-family:var(--f-data)}
   .quota.low{color:var(--danger); font-weight:700}
+
+  /* simulacion */
+  .sim-badge{font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; padding:3px 8px; border-radius:999px; border:1px dashed var(--text-faint); color:var(--text-muted); margin-left:8px; vertical-align:middle; font-family:var(--f-body)}
+  #simulation .kpi{border-style:dashed}
+  .calib{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+  .calib-row{display:grid; grid-template-columns:72px minmax(0,1fr) auto; gap:10px; align-items:center; font-size:12.5px; color:var(--text-muted)}
+  .calib-row .conf{white-space:nowrap}
+  @media (max-width:600px){ .calib-row{grid-template-columns:64px minmax(0,1fr)} .calib-row > span:last-child{grid-column:1 / -1; margin-top:-4px} }
+  .calib-track{position:relative; height:10px; background:var(--surface-2); border-radius:5px}
+  .calib-fill{position:absolute; left:0; top:0; bottom:0; border-radius:5px; background:var(--accent)}
+  .calib-tick{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--text)}
+  .calib-row b{font-family:var(--f-data); color:var(--text)}
+  details.sim-leagues{margin-top:14px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px}
+  details.sim-leagues summary{cursor:pointer; font-weight:600; font-size:13px}
+  .lg-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px}
+  .lg-table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint); font-weight:600; padding:4px 6px; border-bottom:1px solid var(--border)}
+  .lg-table td{padding:5px 6px; border-bottom:1px solid var(--border)}
+  .lg-table td.n{font-family:var(--f-data); text-align:right}
+  .lg-table th.n{text-align:right}
 </style>
 
 <header class="top">
@@ -152,6 +171,12 @@
 <section id="results">
   <div class="section-head"><h2>Últimos resultados</h2><span class="meta" id="resMeta"></span></div>
   <div id="resBody"><div class="skel" style="height:140px"></div></div>
+</section>
+
+<section id="simulation">
+  <div class="section-head"><h2>Simulación con temporadas pasadas <span class="sim-badge">Simulación</span></h2><span class="meta" id="simMeta"></span></div>
+  <p class="note">No son resultados en vivo. Se puso al pronosticador a predecir partidos de las últimas temporadas usando solo lo que se sabía antes de cada partido (el modelo se reentrena día a día y usa las cuotas previas al partido), y luego se comparó con lo que pasó. Solo fútbol. Muestra cómo se habría comportado; los aciertos reales son los de arriba.</p>
+  <div id="simBody"><div class="skel" style="height:160px"></div></div>
 </section>
 
 <footer>
@@ -349,6 +374,50 @@
     body.appendChild(list);
   }
 
+  function renderSimulation(sum, leagues){
+    var body = document.getElementById("simBody"), meta = document.getElementById("simMeta");
+    body.innerHTML = "";
+    var tot = (sum || []).filter(function(r){ return r.confidence == null; })[0];
+    if (!tot || !+tot.n) { body.appendChild(el("div","state-box","La simulación todavía no tiene datos.")); return; }
+    var dd = function(x){ return shortDate(String(x).slice(0,10) + "T12:00:00") + " " + String(x).slice(0,4); };
+    meta.textContent = (+tot.n).toLocaleString("es-CO") + " partidos · " + dd(tot.desde) + " a " + dd(tot.hasta);
+    var k = el("div","kpis");
+    function tile(l, v, sub){ var t = el("div","kpi"); t.appendChild(el("div","l", esc(l))); t.appendChild(el("div","v", pct(+v))); t.appendChild(el("div","s", esc(sub))); return t; }
+    k.appendChild(tile("Resultado (1X2)", tot.hit_result, "azar: 33 %"));
+    k.appendChild(tile("Más/menos 2,5 goles", tot.hit_over, "azar: 50 %"));
+    k.appendChild(tile("Ambos anotan", tot.hit_btts, "azar: 50 %"));
+    k.appendChild(tile("Marcador exacto", tot.hit_score, "es el más difícil"));
+    body.appendChild(k);
+    var cal = el("div","calib");
+    cal.appendChild(el("div","note", "¿Las probabilidades son honestas? La raya negra es lo que dijo el pronosticador en promedio; la barra verde, lo que realmente pasó."));
+    [["alta","Alta"],["media","Media"],["baja","Baja"]].forEach(function(c){
+      var r = (sum || []).filter(function(x){ return x.confidence === c[0]; })[0];
+      if (!r) return;
+      var row = el("div","calib-row");
+      row.appendChild(el("span", null, '<span class="conf ' + c[0] + '">' + c[1] + '</span>'));
+      var tr = el("div","calib-track");
+      var fill = el("div","calib-fill"); fill.style.width = (+r.hit_result * 100) + "%"; tr.appendChild(fill);
+      var tick = el("div","calib-tick"); tick.style.left = "calc(" + (+r.prob_media * 100) + "% - 1px)"; tr.appendChild(tick);
+      row.appendChild(tr);
+      row.appendChild(el("span", null, "dijo <b>" + pct(+r.prob_media) + "</b> · acertó <b>" + pct(+r.hit_result) + "</b> <span style=\"color:var(--text-faint)\">(" + (+r.n).toLocaleString("es-CO") + ")</span>"));
+      cal.appendChild(row);
+    });
+    body.appendChild(cal);
+    if (leagues && leagues.length) {
+      var d = el("details","sim-leagues");
+      d.appendChild(el("summary", null, "Ver por liga (" + leagues.length + ")"));
+      var t = el("table","lg-table");
+      t.innerHTML = '<thead><tr><th>Liga</th><th class="n">Partidos</th><th class="n">1X2</th><th class="n">Alta confianza</th><th class="n">+/- 2,5</th></tr></thead>';
+      var tb = el("tbody");
+      leagues.forEach(function(l){
+        var tr = el("tr");
+        tr.innerHTML = "<td>" + esc(l.league) + "</td><td class=\"n\">" + (+l.n).toLocaleString("es-CO") + "</td><td class=\"n\">" + pct(+l.hit_result) + "</td><td class=\"n\">" + (+l.n_alta ? pct(+l.hit_alta) + " (" + l.n_alta + ")" : "—") + "</td><td class=\"n\">" + pct(+l.hit_over) + "</td>";
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); d.appendChild(t); body.appendChild(d);
+    }
+  }
+
   async function load(){
     renderFilters();
     var b = await runQuery(
@@ -378,6 +447,19 @@
     );
     if (r.error) { document.getElementById("resBody").innerHTML = ""; document.getElementById("resBody").appendChild(errBox(r.error.code)); }
     else { st.results = r.rows; renderResults(); }
+
+    var sm = await runQuery(
+      "select confidence, count(*) n, avg(hit_result::int) hit_result, avg(pick_prob) prob_media, avg(hit_over25::int) hit_over, " +
+      "avg(hit_btts::int) hit_btts, avg(hit_score::int) hit_score, min(match_date) desde, max(match_date) hasta " +
+      "from sim_forecasts group by rollup(confidence);"
+    );
+    var sl = await runQuery(
+      "select league, count(*) n, avg(hit_result::int) hit_result, avg(hit_over25::int) hit_over, " +
+      "count(*) filter (where confidence='alta') n_alta, avg(hit_result::int) filter (where confidence='alta') hit_alta " +
+      "from sim_forecasts group by league order by avg(hit_result::int) desc;"
+    );
+    if (sm.error) { document.getElementById("simBody").innerHTML = ""; document.getElementById("simBody").appendChild(errBox(sm.error.code)); }
+    else renderSimulation(sm.rows, sl.error ? [] : sl.rows);
 
     var q = await runQuery("select remaining, updated_at from api_quota where api = 'the-odds-api';");
     if (!q.error && q.rows && q.rows[0]) {
