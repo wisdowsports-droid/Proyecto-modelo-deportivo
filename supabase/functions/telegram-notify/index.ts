@@ -75,7 +75,7 @@ Deno.serve(async (req: Request) => {
 
   if (mode === "pin") {
     if (!dashUrl) return json({ ok: false, error: "Falta dashboard_url en app_settings" }, 400);
-    const r = await send("📊 <b>Tu dashboard de Kinetik Picks</b>\nToca el botón para abrirlo. Si te pide iniciar sesión, elige <i>Abrir en navegador</i> (Chrome), donde ya tienes Claude abierto.");
+    const r = await send("📊 <b>Tu dashboard de Kinetik Picks</b>\nToca el botón para ver los picks gratis de hoy, su historial y el récord en vivo. Se actualiza solo.");
     if (r.ok) await tg("pinChatMessage", { chat_id: chat, message_id: r.result.message_id, disable_notification: true });
     return json({ ok: r.ok, telegram: r.ok ? "enviado y fijado" : r.description });
   }
