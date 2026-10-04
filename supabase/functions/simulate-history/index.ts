@@ -34,7 +34,8 @@ const MAIN_SEASONS = ["2122", "2223", "2324", "2425", "2526", "2627"];
 // misma configuracion que produccion (refit_team_strengths_from_history v2)
 const H = 365, K = 4, RHO = -0.08, W_MODEL = 0.3, SEASONS_BACK = 2;
 
-type Match = { season: string; date: string; home: string; away: string; hg: number; ag: number; pre: number[] | null; closing: boolean };
+type Match = { season: string; date: string; home: string; away: string; hg: number; ag: number; pre: number[] | null; closing: boolean;
+  hc: number | null; ac: number | null; hk: number | null; ak: number | null };
 
 function num(v?: string) { const n = parseFloat(v ?? ""); return Number.isFinite(n) && n > 1 ? n : null; }
 function triple(r: Record<string, string>, a: string, b: string, c: string) {
@@ -59,7 +60,12 @@ function toMatch(r: Record<string, string>, season: string): Match | null {
   // CIERRE (justo antes del inicio): se usan y se marca la fuente.
   const pre = triple(r, "AvgH", "AvgD", "AvgA") ?? triple(r, "PSH", "PSD", "PSA") ?? triple(r, "B365H", "B365D", "B365A");
   const close = pre ? null : (triple(r, "AvgCH", "AvgCD", "AvgCA") ?? triple(r, "PSCH", "PSCD", "PSCA"));
-  return { season, date, home: home.trim(), away: away.trim(), hg, ag, pre: pre ?? close, closing: !pre && !!close };
+  const int = (v?: string) => { const n = parseInt(v ?? "", 10); return Number.isNaN(n) ? null : n; };
+  const hc = int(r.HC), ac = int(r.AC);
+  const hy = int(r.HY), ay = int(r.AY);
+  // tarjetas = amarillas + rojas, igual que produccion
+  const hk = hy == null ? null : hy + (int(r.HR) ?? 0), ak = ay == null ? null : ay + (int(r.AR) ?? 0);
+  return { season, date, home: home.trim(), away: away.trim(), hg, ag, pre: pre ?? close, closing: !pre && !!close, hc, ac, hk, ak };
 }
 async function fetchText(url: string) {
   for (let i = 0; i < 4; i++) {
@@ -129,15 +135,17 @@ function tau(i: number, j: number, lh: number, la: number) {
   return 1;
 }
 function forecast(lh: number, la: number) {
-  let h = 0, d = 0, a = 0, over = 0, btts = 0, tot = 0, best = -1, th = 0, ta = 0;
+  let h = 0, d = 0, a = 0, over = 0, over15 = 0, over35 = 0, btts = 0, tot = 0, best = -1, th = 0, ta = 0;
   for (let i = 0; i <= 10; i++) for (let j = 0; j <= 10; j++) {
     const p = pois(i, lh) * pois(j, la) * Math.max(tau(i, j, lh, la), 0); tot += p;
     if (i > j) h += p; else if (i === j) d += p; else a += p;
     if (i + j > 2.5) over += p;
+    if (i + j > 1.5) over15 += p;
+    if (i + j > 3.5) over35 += p;
     if (i > 0 && j > 0) btts += p;
     if (p > best) { best = p; th = i; ta = j; }
   }
-  return { x: [h / tot, d / tot, a / tot], over: over / tot, btts: btts / tot, th, ta };
+  return { x: [h / tot, d / tot, a / tot], over: over / tot, over15: over15 / tot, over35: over35 / tot, btts: btts / tot, th, ta, eg: lh + la };
 }
 function shin(odds: number[]): number[] {
   const p = odds.map((o) => 1 / o), total = p.reduce((a, b) => a + b, 0);
@@ -155,6 +163,32 @@ function blend(p: number[], q: number[]) {
   const s = r.reduce((a, b) => a + b, 0); return r.map((v) => v / s);
 }
 const r4 = (v: number) => Math.round(v * 10000) / 10000;
+
+// Corners y tarjetas: replica del metodo v1 de produccion
+// (refit_team_strengths_from_history): promedios simples de los ultimos 730
+// dias, fuerza del equipo = promedio del equipo / promedio de la liga.
+// esperado = base_local * ataque_local * defensa_visita + base_visita * ataque_visita * defensa_local
+function statModel(games: Match[], asOf: string, fh: (g: Match) => number | null, fa: (g: Match) => number | null) {
+  const from = Date.parse(asOf) - 730 * 86400000, to = Date.parse(asOf);
+  let sh = 0, sa = 0, n = 0;
+  const T: Record<string, { f: number; a: number; n: number }> = {};
+  for (const g of games) {
+    const t = Date.parse(g.date); if (t <= from || t >= to) continue;
+    const h = fh(g), a = fa(g); if (h == null || a == null) continue;
+    sh += h; sa += a; n++;
+    (T[g.home] ??= { f: 0, a: 0, n: 0 }); (T[g.away] ??= { f: 0, a: 0, n: 0 });
+    T[g.home].f += h; T[g.home].a += a; T[g.home].n++;
+    T[g.away].f += a; T[g.away].a += h; T[g.away].n++;
+  }
+  if (!n) return null;
+  const bh = sh / n, ba = sa / n, all = (bh + ba) / 2;
+  return (home: string, away: string) => {
+    const th = T[home], ta = T[away];
+    if (!th || !ta || !all) return null;
+    return bh * (th.f / th.n / all) * (ta.a / ta.n / all) + ba * (ta.f / ta.n / all) * (th.a / th.n / all);
+  };
+}
+function poisOver(l: number, line: number) { let c = 0; for (let k = 0; k <= Math.floor(line); k++) c += pois(k, l); return 1 - c; }
 
 Deno.serve(async (req: Request) => {
   let body: any = {};
@@ -183,7 +217,10 @@ Deno.serve(async (req: Request) => {
     const played: Match[] = [];
     let warm: Fit | null = null;
     for (const d of Object.keys(byDate).sort()) {
-      warm = fitIter([...older, ...prev, ...played], d, prevTeams, warm);
+      const pool = [...older, ...prev, ...played];
+      warm = fitIter(pool, d, prevTeams, warm);
+      const cornersOf = statModel(pool, d, (g) => g.hc, (g) => g.ac);
+      const cardsOf = statModel(pool, d, (g) => g.hk, (g) => g.ak);
       for (const m of byDate[d]) {
         const ah = warm.att[m.home], dh = warm.def[m.home], aa = warm.att[m.away], da = warm.def[m.away];
         if (ah == null || aa == null) { skipped++; continue; }
@@ -193,12 +230,22 @@ Deno.serve(async (req: Request) => {
         const pick = ["Local", "Empate", "Visitante"][best];
         const pp = x[best];
         const y = m.hg > m.ag ? 0 : m.hg === m.ag ? 1 : 2;
+        const ce = cornersOf ? cornersOf(m.home, m.away) : null;
+        const ke = cardsOf ? cardsOf(m.home, m.away) : null;
+        const co = ce != null ? poisOver(ce, 9.5) : null, ko = ke != null ? poisOver(ke, 4.5) : null;
+        const tc = m.hc != null && m.ac != null ? m.hc + m.ac : null, tk = m.hk != null && m.ak != null ? m.hk + m.ak : null;
         rows.push({
+          corners_exp: ce != null ? r4(ce) : null, corners_over95: co != null ? r4(co) : null, total_corners: tc,
+          hit_corners: co != null && tc != null ? (co >= 0.5) === (tc > 9.5) : null,
+          cards_exp: ke != null ? r4(ke) : null, cards_over45: ko != null ? r4(ko) : null, total_cards: tk,
+          hit_cards: ko != null && tk != null ? (ko >= 0.5) === (tk > 4.5) : null,
           league: label, season: m.season, match_date: m.date, home_team: m.home, away_team: m.away,
           source: !m.pre ? "modelo" : m.closing ? "modelo + mercado (cierre)" : "modelo + mercado",
           p_home: r4(x[0]), p_draw: r4(x[1]), p_away: r4(x[2]), pick, pick_prob: r4(pp),
           confidence: pp >= 0.6 ? "alta" : pp >= 0.45 ? "media" : "baja",
           over25: r4(f.over), btts: r4(f.btts), top_home: f.th, top_away: f.ta,
+          over15: r4(f.over15), hit_over15: (f.over15 >= 0.5) === (m.hg + m.ag > 1.5),
+          over35: r4(f.over35), hit_over35: (f.over35 >= 0.5) === (m.hg + m.ag > 3.5), exp_goals: r4(f.eg),
           home_score: m.hg, away_score: m.ag,
           hit_result: best === y, hit_over25: (f.over >= 0.5) === (m.hg + m.ag > 2.5),
           hit_btts: (f.btts >= 0.5) === (m.hg > 0 && m.ag > 0), hit_score: f.th === m.hg && f.ta === m.ag,

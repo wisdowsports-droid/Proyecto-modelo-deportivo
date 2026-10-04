@@ -105,6 +105,25 @@
   .band-empty{background:var(--band-2); border-radius:14px; padding:18px; color:var(--band-muted); font-size:14px; position:relative; z-index:1}
   .band-foot{font-size:12px; color:var(--band-muted); position:relative; z-index:1}
 
+  /* selección del día */
+  .sel-list{display:flex; flex-direction:column; gap:8px}
+  .sel{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px 16px}
+  .sel .rk{font-family:var(--f-display); font-size:28px; font-weight:700; color:var(--ink-3); width:26px; text-align:center}
+  .sel .mid{min-width:0; display:flex; flex-direction:column; gap:3px}
+  .sel .lg{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); font-weight:600}
+  .sel .tm{font-size:14px; font-weight:600}
+  .sel .what{font-family:var(--f-display); font-size:20px; font-weight:700; line-height:1.1}
+  .sel .right{display:flex; flex-direction:column; align-items:flex-end; gap:4px; text-align:right}
+  .sel .p{font-family:var(--f-data); font-size:24px; font-weight:600; color:var(--accent)}
+  .sel .odds{font-size:12px; color:var(--ink-2); white-space:nowrap}
+  .sel .odds b{font-family:var(--f-data); color:var(--ink)}
+  .sel .st{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-2)}
+  .sel .st.ok{background:var(--win-soft); color:var(--win)} .sel .st.no{background:var(--loss-soft); color:var(--loss)}
+  .sel.void{opacity:.6}
+  @media (max-width:560px){ .sel{grid-template-columns:auto minmax(0,1fr)} .sel .right{grid-column:2; align-items:flex-start; text-align:left; flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px} }
+  .rule{background:var(--accent-soft); border-radius:10px; padding:10px 14px; font-size:13px; color:var(--ink-2); margin-top:10px}
+  .rule b{color:var(--ink)}
+
   /* récord */
   .kpis{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
   @media (max-width:760px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
@@ -227,6 +246,13 @@
     </div>
     <div id="freeBody"><div class="skel" style="height:130px"></div></div>
     <div class="band-foot">Aciertan mucho y pagan cuotas bajas. Los pronósticos de mayor pago están en la parrilla Pro.</div>
+  </section>
+
+  <section id="selection" aria-labelledby="selTitle">
+    <div class="sec-head"><h2 id="selTitle">Selección del día <span class="pill pro">Pro</span></h2><span class="meta" id="selMeta"></span></div>
+    <p class="lede">Máximo 5 partidos de fútbol con la probabilidad más alta del día, en los mercados más confiables según la prueba histórica: doble oportunidad, resultado, más de 1,5 goles y menos de 3,5 goles. Se publica a las 6:05 a. m. (hora de Colombia) y no se cambia.</p>
+    <div id="selBody"><div class="skel" style="height:200px"></div></div>
+    <div class="rule"><b>Cuota mínima:</b> apuesta solo si la casa paga <b>más</b> que la cuota mínima de cada pick. Si paga menos, a la larga se pierde aunque se acierte seguido. Son apuestas para hacer <b>por separado</b>: 5 picks del 85 % juntos en una combinada aciertan todos solo el 44 % de las veces.</div>
   </section>
 
   <section id="accuracy" aria-labelledby="accTitle">
@@ -385,6 +411,36 @@
     body.appendChild(g);
   }
 
+  /* ---------- selección del día ---------- */
+  function renderSelection(picks, rec){
+    var body = document.getElementById("selBody"), meta = document.getElementById("selMeta");
+    body.innerHTML = "";
+    meta.textContent = rec && +rec.n ? "Récord en vivo: " + rec.h + " de " + rec.n + " (" + pct(rec.h / rec.n) + ")" : "Récord en vivo: empieza hoy";
+    if (!picks || !picks.length) {
+      body.appendChild(el("div","state-box","Hoy no hay partidos que alcancen el 75 % en los mercados confiables. La próxima selección sale mañana a las 6:05 a. m."));
+      return;
+    }
+    var list = el("div","sel-list");
+    picks.forEach(function(p){
+      var c = el("article","sel" + (p.void_reason ? " void" : ""));
+      c.appendChild(el("div","rk", String(p.rank)));
+      var mid = el("div","mid");
+      mid.appendChild(el("div","lg", esc(lgName(p.league)) + " · " + fmtTime(p.commence_time)));
+      mid.appendChild(el("div","tm", esc(p.home_team) + ' <span style="color:var(--ink-3);font-weight:400">vs</span> ' + esc(p.away_team)));
+      mid.appendChild(el("div","what", esc(p.label)));
+      c.appendChild(mid);
+      var r = el("div","right");
+      r.appendChild(el("div","p", pct(+p.prob)));
+      r.appendChild(el("div","odds", "Cuota mínima <b>" + (+p.min_odds).toFixed(2).replace(".", ",") + "</b>"));
+      var st = p.void_reason ? ["", "Anulado"] : p.hit === true ? ["ok", "✓ " + p.home_score + "-" + p.away_score] : p.hit === false ? ["no", "✗ " + p.home_score + "-" + p.away_score] : ["", "Por jugarse"];
+      var stEl = el("span","st " + st[0], esc(st[1])); if (p.void_reason) stEl.title = p.void_reason;
+      r.appendChild(stEl);
+      c.appendChild(r);
+      list.appendChild(c);
+    });
+    body.appendChild(list);
+  }
+
   /* ---------- parrilla ---------- */
   // Respaldo histórico de este tipo de pronóstico (misma liga y confianza).
   // Con menos de 30 partidos en la liga se usa el total de todas las ligas.
@@ -431,9 +487,14 @@
 
     var mk = el("div","mk"), n = 0;
     if (f.dc_prob != null) { mk.appendChild(el("span","dc", "Doble oportunidad: " + esc(dcText(f.dc_pick, f.home_team, f.away_team)) + " <b>" + pct(+f.dc_prob) + "</b>")); n++; }
-    if (f.over25 != null) { var o = +f.over25; mk.appendChild(el("span", null, (o >= .5 ? "Más" : "Menos") + " de 2,5 goles <b>" + pct(o >= .5 ? o : 1-o) + "</b>")); n++; }
+    if (f.over25 != null) {
+      var lines = [["1,5", f.over15], ["2,5", f.over25], ["3,5", f.over35]].filter(function(x){ return x[1] != null; });
+      mk.appendChild(el("span", null, "Goles: " + lines.map(function(x){ var o = +x[1]; return (o >= .5 ? "+" : "−") + x[0] + " <b>" + pct(o >= .5 ? o : 1-o) + "</b>"; }).join(" · "))); n++;
+    }
     if (f.btts != null) { var b = +f.btts; mk.appendChild(el("span", null, "Ambos anotan: " + (b >= .5 ? "Sí" : "No") + " <b>" + pct(b >= .5 ? b : 1-b) + "</b>")); n++; }
-    if (f.top_home != null) { mk.appendChild(el("span", null, "Marcador probable <b>" + f.top_home + "-" + f.top_away + "</b>")); n++; }
+    var ts = f.top_scores; if (typeof ts === "string") { try { ts = JSON.parse(ts); } catch(e){ ts = null; } }
+    if (ts && ts.length) { mk.appendChild(el("span", null, "Marcadores: " + ts.map(function(x){ return "<b>" + x.h + "-" + x.a + "</b> " + pct(+x.p); }).join(" · "))); n++; }
+    else if (f.top_home != null) { mk.appendChild(el("span", null, "Marcador probable <b>" + f.top_home + "-" + f.top_away + "</b>")); n++; }
     if (f.corners_exp != null) { var co = +f.corners_over95; mk.appendChild(el("span", null, "Córners ~<b>" + dec(f.corners_exp) + "</b> · " + (co >= .5 ? "más" : "menos") + " de 9,5 <b>" + pct(co >= .5 ? co : 1-co) + "</b>")); n++; }
     if (f.cards_exp != null) { var ca = +f.cards_over45; mk.appendChild(el("span", null, "Tarjetas ~<b>" + dec(f.cards_exp) + "</b> · " + (ca >= .5 ? "más" : "menos") + " de 4,5 <b>" + pct(ca >= .5 ? ca : 1-ca) + "</b>")); n++; }
     if (n) c.appendChild(mk);
@@ -514,6 +575,7 @@
       var tot = +s["n_" + c[0]], h = +s["h_" + c[0]];
       row.appendChild(el("div","conf-item", '<span class="conf ' + c[0] + '">' + c[1] + '</span> ' + (tot ? '<b>' + pct(h/tot) + '</b> (' + h + ' de ' + tot + ')' : 'sin datos')));
     });
+    row.appendChild(el("div","conf-item", 'Goles 1,5 ' + (+s.n_o15 ? '<b>' + pct(+s.hit_o15 / +s.n_o15) + '</b> (' + s.hit_o15 + ' de ' + s.n_o15 + ')' : 'empieza hoy')));
     row.appendChild(el("div","conf-item", 'Marcador exacto ' + (+s.n_score ? '<b>' + pct(+s.hit_score / +s.n_score) + '</b> (' + s.hit_score + ' de ' + s.n_score + ')' : 'sin datos')));
     body.appendChild(row);
   }
@@ -553,6 +615,13 @@
     k.appendChild(kpiTile("Más/menos 2,5 goles", pct(+tot.hit_over), "al azar: 50 %", +tot.hit_over, .5));
     k.appendChild(kpiTile("Ambos anotan", pct(+tot.hit_btts), "al azar: 50 %", +tot.hit_btts, .5));
     body.appendChild(k);
+    var extra = el("div","conf-row");
+    if (tot.hit_o15 != null) extra.appendChild(el("div","conf-item", "Goles más/menos 1,5 <b>" + pct(+tot.hit_o15) + "</b>"));
+    if (tot.hit_o35 != null) extra.appendChild(el("div","conf-item", "Goles más/menos 3,5 <b>" + pct(+tot.hit_o35) + "</b>"));
+    extra.appendChild(el("div","conf-item", "Marcador exacto <b>" + pct(+tot.hit_score) + "</b>"));
+    if (+tot.n_cards) extra.appendChild(el("div","conf-item", "Tarjetas más/menos 4,5 <b>" + pct(+tot.hit_cards) + "</b> (" + nf(tot.n_cards) + ")"));
+    if (+tot.n_corners) extra.appendChild(el("div","conf-item", "Córners más/menos 9,5 <b>" + pct(+tot.hit_corners) + "</b> (" + nf(tot.n_corners) + ")"));
+    body.appendChild(extra);
 
     var cal = el("div","calib");
     cal.appendChild(el("p","q", "¿Las probabilidades son confiables? La raya es la probabilidad que dio el pronosticador; la barra, lo que realmente pasó."));
@@ -600,6 +669,14 @@
     if (fr.error) { var fb = document.getElementById("freeBody"); fb.innerHTML = ""; fb.appendChild(errBox(fr.error.code)); }
     else renderFree(fj ? fj.picks : [], fj ? fj.rec : null, fj ? fj.hist : null);
 
+    var sr = await runQuery(
+      "select json_build_object(" +
+      "'picks', (select coalesce(json_agg(t order by t.rank), '[]'::json) from (select * from selection_results where pick_date = (now() at time zone 'America/Bogota')::date) t), " +
+      "'rec', (select json_build_object('n', count(hit), 'h', count(*) filter (where hit)) from selection_results)) j;"
+    );
+    if (sr.error) { var sb = document.getElementById("selBody"); sb.innerHTML = ""; sb.appendChild(errBox(sr.error.code)); }
+    else { var sj = sr.rows && sr.rows[0] ? sr.rows[0].j : null; renderSelection(sj ? sj.picks : [], sj ? sj.rec : null); }
+
     var t = await runQuery(
       "select coalesce(league,'*') league, confidence, count(*) n, avg(hit_result::int) hit " +
       "from sim_forecasts group by grouping sets ((league, confidence), (confidence));"
@@ -608,7 +685,7 @@
 
     var b = await runQuery(
       "select fixture_id, sport, league, home_team, away_team, commence_time, source, p_home, p_draw, p_away, pick, pick_prob, confidence, " +
-      "over25, btts, top_home, top_away, corners_exp, corners_over95, cards_exp, cards_over45, dc_pick, dc_prob " +
+      "over25, btts, top_home, top_away, corners_exp, corners_over95, cards_exp, cards_over45, dc_pick, dc_prob, top_scores, over15, over35 " +
       "from forecast_board order by commence_time limit 600;"
     );
     if (b.error) st.boardErr = b.error; else st.board = b.rows;
@@ -618,6 +695,7 @@
       "select count(*) n, count(*) filter (where hit_result) hit_result, " +
       "count(hit_dc) n_dc, count(*) filter (where hit_dc) hit_dc, " +
       "count(hit_over25) n_over, count(*) filter (where hit_over25) hit_over, " +
+      "count(hit_over15) n_o15, count(*) filter (where hit_over15) hit_o15, " +
       "count(hit_btts) n_btts, count(*) filter (where hit_btts) hit_btts, " +
       "count(hit_score) n_score, count(*) filter (where hit_score) hit_score, " +
       "count(*) filter (where confidence='alta') n_alta, count(*) filter (where confidence='alta' and hit_result) h_alta, " +
@@ -637,7 +715,9 @@
 
     var sm = await runQuery(
       "select confidence, count(*) n, avg(hit_result::int) hit_result, avg(pick_prob) prob_media, avg(hit_over25::int) hit_over, " +
-      "avg(hit_btts::int) hit_btts, avg(hit_score::int) hit_score, min(match_date) desde, max(match_date) hasta " +
+      "avg(hit_btts::int) hit_btts, avg(hit_score::int) hit_score, min(match_date) desde, max(match_date) hasta, " +
+      "avg(hit_cards::int) hit_cards, count(hit_cards) n_cards, avg(hit_corners::int) hit_corners, count(hit_corners) n_corners, " +
+      "avg(hit_over15::int) hit_o15, avg(hit_over35::int) hit_o35 " +
       "from sim_forecasts group by rollup(confidence);"
     );
     var sl = await runQuery(
