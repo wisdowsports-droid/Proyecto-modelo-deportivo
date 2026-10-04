@@ -11,6 +11,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 //   "morning" -> manda los picks de hoy (una vez por dia)
 //   "results" -> si ya terminaron todos los picks de hoy/ayer, manda el resumen (una vez por dia)
 //   "test"    -> mensaje de prueba
+//   "pin"     -> envia y fija en el chat un mensaje con el boton del dashboard
+// El enlace del dashboard se lee de app_settings (key 'dashboard_url').
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY =
@@ -63,7 +65,20 @@ Deno.serve(async (req: Request) => {
 
   const chat = await chatId();
   if (!chat) return json({ ok: false, error: lastUpdatesError ?? "No encontre tu chat. Abre tu bot en Telegram y escribele /start, luego intenta de nuevo." }, 400);
-  const send = (text: string) => tg("sendMessage", { chat_id: chat, text, parse_mode: "HTML", disable_web_page_preview: true });
+  const { data: du } = await supabase.from("app_settings").select("value").eq("key", "dashboard_url").maybeSingle();
+  const dashUrl = du?.value ?? null;
+  // boton "Abrir dashboard" debajo de cada mensaje
+  const send = (text: string) => tg("sendMessage", {
+    chat_id: chat, text, parse_mode: "HTML", disable_web_page_preview: true,
+    ...(dashUrl ? { reply_markup: { inline_keyboard: [[{ text: "📊 Abrir dashboard", url: dashUrl }]] } } : {}),
+  });
+
+  if (mode === "pin") {
+    if (!dashUrl) return json({ ok: false, error: "Falta dashboard_url en app_settings" }, 400);
+    const r = await send("📊 <b>Tu dashboard de Kinetik Picks</b>\nToca el botón para abrirlo. Si te pide iniciar sesión, elige <i>Abrir en navegador</i> (Chrome), donde ya tienes Claude abierto.");
+    if (r.ok) await tg("pinChatMessage", { chat_id: chat, message_id: r.result.message_id, disable_notification: true });
+    return json({ ok: r.ok, telegram: r.ok ? "enviado y fijado" : r.description });
+  }
 
   if (mode === "detect" || mode === "test") {
     const r = await send("✅ <b>Kinetik Picks conectado</b>\nDesde ahora te aviso aquí los picks de la Selección del día y sus resultados apenas termine el último partido.");
