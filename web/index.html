@@ -234,6 +234,11 @@
   .cta{display:inline-flex; align-items:center; gap:8px; margin-top:14px; padding:10px 18px; border-radius:999px; background:var(--ink); color:var(--bg); font-weight:700; font-size:14px; text-decoration:none}
   .cta:hover{opacity:.9}
   .lock{font-size:12.5px; color:var(--ink-3); margin-top:8px}
+  .band.mine{border:2px solid var(--gold)}
+  .fp-odds{font-size:12.5px; color:var(--band-muted)} .fp-odds b{color:var(--band-ink); font-family:var(--f-data)}
+  .fp.void{opacity:.5}
+  .mine-rec{font-size:13px; color:var(--band-muted); position:relative; z-index:1}
+  .mine-rec b{color:var(--band-ink)}
 </style>
 </head>
 <body>
@@ -255,6 +260,17 @@
 </header>
 
 <main class="wrap">
+  <section id="mine" class="band mine" aria-labelledby="mineTitle" hidden>
+    <div class="band-head">
+      <div>
+        <h2 id="mineTitle">Tu Selección del día <span class="pill pro">Pro</span></h2>
+        <p class="sub">Los 5 pronósticos con la probabilidad más alta de hoy, en cualquier mercado. Apuesta solo si la casa paga más que la cuota mínima. Esta sección solo la ves tú.</p>
+      </div>
+      <div class="band-stats" id="mineStats"></div>
+    </div>
+    <div id="mineBody"></div>
+    <div class="mine-rec" id="mineRecent"></div>
+  </section>
   <section id="free" class="band" aria-labelledby="freeTitle">
     <div class="band-head">
       <div>
@@ -506,7 +522,61 @@
     body.appendChild(row);
   }
 
+  /* ---------- seleccion privada (solo con llave) ---------- */
+  var KEY = null;
+  try {
+    var qk = new URLSearchParams(location.search).get("k");
+    if (qk) { try { localStorage.setItem("kp_key", qk); } catch(e) {} history.replaceState(null, "", location.pathname); }
+    KEY = qk; if (!KEY) { try { KEY = localStorage.getItem("kp_key"); } catch(e) {} }
+  } catch(e) {}
+  function renderMine(d){
+    var sec = document.getElementById("mine");
+    if (!d) { sec.hidden = true; return; }
+    sec.hidden = false;
+    var body = document.getElementById("mineBody"), stats = document.getElementById("mineStats"), rc = document.getElementById("mineRecent");
+    body.innerHTML = ""; stats.innerHTML = ""; rc.innerHTML = "";
+    var rec = d.rec || {};
+    var s = el("div","bstat"); s.appendChild(el("div","v", +rec.n ? rec.h + "/" + rec.n : "—")); s.appendChild(el("div","l", +rec.n ? "acertados en vivo (" + pct(rec.h/rec.n) + ")" : "récord en vivo: empieza hoy")); stats.appendChild(s);
+    var picks = d.picks || [];
+    if (!picks.length) { body.appendChild(el("div","band-empty","Hoy no hay Selección todavía. Se publica a las 6:05 a. m. (hora de Colombia).")); }
+    else {
+      var g = el("div","free-grid");
+      picks.forEach(function(p){
+        var c = el("article","fp" + (p.void ? " void" : ""));
+        var top = el("div","fp-top");
+        top.appendChild(el("span","lg", "#" + p.rank + " · " + esc(lgName(p.league))));
+        top.appendChild(el("span","num", fmtTime(p.commence_time)));
+        c.appendChild(top);
+        c.appendChild(el("div","fp-teams", esc(p.home_team) + '<span class="vs">vs</span>' + esc(p.away_team)));
+        var pk = el("div","fp-pick");
+        pk.appendChild(el("span","what", esc(p.label)));
+        pk.appendChild(el("span","p", pct(+p.prob)));
+        c.appendChild(pk);
+        c.appendChild(el("div","fp-odds", "Cuota mínima <b>" + String(p.min_odds).replace(".", ",") + "</b>"));
+        var sc = p.home_score != null ? " · " + p.home_score + "-" + p.away_score : "";
+        var st = p.void ? ["","Anulado"] : p.hit === true ? ["ok","✓ Acertado" + sc] : p.hit === false ? ["no","✗ Fallado" + sc] : ["","Por jugarse"];
+        c.appendChild(el("span","fp-state " + st[0], esc(st[1])));
+        g.appendChild(c);
+      });
+      body.appendChild(g);
+    }
+    var rcnt = d.recent || [];
+    if (rcnt.length) {
+      var ok = rcnt.filter(function(r){ return r.hit; }).length;
+      rc.innerHTML = "Últimos 7 días: <b>" + ok + " de " + rcnt.length + "</b> acertados · " + rcnt.slice(0, 10).map(function(r){ return (r.hit ? "✓ " : "✗ ") + esc(r.label) + " (" + esc(r.home_team) + " " + r.home_score + "-" + r.away_score + ")"; }).join(" · ");
+    }
+  }
+  async function loadMine(){
+    if (!KEY) return;
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_selection"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (!r.ok) return;
+      renderMine(await r.json());
+    } catch(e) {}
+  }
+
   async function load(){
+    loadMine();
     var d;
     try {
       var r = await fetch(API, { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: "{}" });
