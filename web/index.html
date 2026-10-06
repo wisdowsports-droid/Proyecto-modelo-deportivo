@@ -274,6 +274,14 @@
     <div id="mineBody"></div>
     <div class="mine-rec" id="mineRecent"></div>
   </section>
+
+  <section id="board" aria-labelledby="boardTitle" hidden>
+    <div class="sec-head"><h2 id="boardTitle">Parrilla completa <span class="pill pro">Pro</span></h2><span class="meta" id="boardMeta"></span></div>
+    <p class="lede">Todos los partidos de los próximos 3 días con el pronóstico del modelo: resultado, doble oportunidad, goles, ambos anotan, marcador probable, córners y tarjetas. Solo la ves tú.</p>
+    <div id="boardBody"></div>
+    <div class="sec-head" style="margin-top:26px"><h2>Resultados de la parrilla · 48 h</h2><span class="meta" id="recentMeta"></span></div>
+    <div id="recentBody"></div>
+  </section>
   <section id="free" class="band" aria-labelledby="freeTitle">
     <div class="band-head">
       <div>
@@ -569,7 +577,87 @@
       rc.innerHTML = "Últimos 7 días: <b>" + ok + " de " + rcnt.length + "</b> acertados · " + rcnt.slice(0, 10).map(function(r){ return (r.hit ? "✓ " : "✗ ") + esc(r.label) + " (" + esc(r.home_team) + " " + r.home_score + "-" + r.away_score + ")"; }).join(" · ");
     }
   }
+  /* ---------- parrilla completa (solo con llave) ---------- */
+  function pickName(p, h, a){ return p === "Local" ? h : p === "Visitante" ? a : "Empate"; }
+  function renderBoard(d){
+    var sec = document.getElementById("board");
+    if (!d) { sec.hidden = true; return; }
+    sec.hidden = false;
+    var body = document.getElementById("boardBody"); body.innerHTML = "";
+    var up = d.upcoming || [];
+    document.getElementById("boardMeta").textContent = up.length + " partidos";
+    if (!up.length) body.appendChild(el("div","state-box","No hay partidos en los próximos 3 días."));
+    var days = {}, order = [];
+    up.forEach(function(f){ var k = fmtDay(f.commence_time); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
+    order.forEach(function(k){
+      var day = el("div","day");
+      day.appendChild(el("div","day-title", esc(k) + ' <span class="n">' + days[k].length + (days[k].length === 1 ? ' partido' : ' partidos') + '</span>'));
+      var g = el("div","grid");
+      days[k].forEach(function(f){
+        var c = el("article","fc");
+        var top = el("div","fc-top");
+        top.appendChild(el("div","teams", esc(f.home_team) + '<span class="vs">vs</span>' + esc(f.away_team) + '<div class="src">' + esc(lgName(f.league)) + '</div>'));
+        top.appendChild(el("span","when", fmtTime(f.commence_time)));
+        c.appendChild(top);
+        var v = el("div","verdict");
+        v.appendChild(el("span","pick", esc(pickName(f.pick, f.home_team, f.away_team))));
+        v.appendChild(el("span","pct", pct(+f.pick_prob)));
+        if (f.confidence) v.appendChild(el("span","conf " + f.confidence, esc(f.confidence)));
+        c.appendChild(v);
+        var bar = el("div","bar");
+        [["h", f.p_home],["d", f.p_draw],["a", f.p_away]].forEach(function(x){ var s = el("span", x[0]); s.style.width = (+x[1] * 100) + "%"; bar.appendChild(s); });
+        c.appendChild(bar);
+        c.appendChild(el("div","bar-l", '<span><i class="dot h"></i>Local <b>' + pct(+f.p_home) + '</b></span><span><i class="dot d"></i>Empate <b>' + pct(+f.p_draw) + '</b></span><span><i class="dot a"></i>Visita <b>' + pct(+f.p_away) + '</b></span>'));
+        var mk = el("div","mk"), parts = [];
+        if (f.dc_prob != null) parts.push('<span class="dc">' + esc((f.dc_pick === "1X" ? f.home_team : f.away_team) + " o empate") + ' <b>' + pct(+f.dc_prob) + '</b></span>');
+        if (f.over15 != null) parts.push('<span>+1,5 goles <b>' + pct(+f.over15) + '</b></span>');
+        if (f.over25 != null) parts.push('<span>+2,5 goles <b>' + pct(+f.over25) + '</b></span>');
+        if (f.over35 != null) parts.push('<span>-3,5 goles <b>' + pct(1 - f.over35) + '</b></span>');
+        if (f.btts != null) parts.push('<span>Ambos anotan <b>' + pct(+f.btts) + '</b></span>');
+        if (f.top_home != null) parts.push('<span>Marcador <b>' + f.top_home + '-' + f.top_away + '</b></span>');
+        if (f.corners_exp != null) parts.push('<span>Córners ~<b>' + dec(f.corners_exp) + '</b></span>');
+        if (f.cards_exp != null) parts.push('<span>Tarjetas ~<b>' + dec(f.cards_exp) + '</b></span>');
+        mk.innerHTML = parts.join("");
+        c.appendChild(mk);
+        g.appendChild(c);
+      });
+      day.appendChild(g); body.appendChild(day);
+    });
+    // resultados 48 h
+    var rb = document.getElementById("recentBody"); rb.innerHTML = "";
+    var rec = d.recent || [];
+    var n = rec.length, h1 = rec.filter(function(r){ return r.hit_result; }).length,
+        ndc = rec.filter(function(r){ return r.hit_dc != null; }).length, hdc = rec.filter(function(r){ return r.hit_dc; }).length;
+    document.getElementById("recentMeta").textContent = n ? ("Resultado " + h1 + "/" + n + " · Doble oport. " + hdc + "/" + ndc) : "";
+    if (!n) { rb.appendChild(el("div","state-box","Todavía no hay partidos calificados en las últimas 48 horas.")); return; }
+    var box = el("div","res-list");
+    rec.forEach(function(r){
+      var it = el("div","res");
+      it.appendChild(el("div", r.hit_result ? "mark-ok" : "mark-no", r.hit_result ? "✓" : "✗"));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", esc(r.home_team) + ' <span class="sc">' + r.home_score + "-" + r.away_score + "</span> " + esc(r.away_team)));
+      var bits = ["Pick: " + esc(pickName(r.pick, r.home_team, r.away_team)) + " " + pct(+r.pick_prob)];
+      if (r.hit_dc != null) bits.push("DC " + (r.hit_dc ? "✓" : "✗"));
+      if (r.hit_over15 != null) bits.push("1,5 " + (r.hit_over15 ? "✓" : "✗"));
+      if (r.hit_over25 != null) bits.push("2,5 " + (r.hit_over25 ? "✓" : "✗"));
+      if (r.hit_btts != null) bits.push("AA " + (r.hit_btts ? "✓" : "✗"));
+      mid.appendChild(el("div","d", bits.join(" · ") + " · " + esc(lgName(r.league))));
+      it.appendChild(mid);
+      box.appendChild(it);
+    });
+    rb.appendChild(box);
+  }
+  async function loadBoard(){
+    if (!KEY) return;
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_board"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (!r.ok) return;
+      renderBoard(await r.json());
+    } catch(e) {}
+  }
+
   async function loadMine(){
+    loadBoard();
     if (!KEY) return;
     try {
       var r = await fetch(API.replace("public_free_dashboard", "owner_selection"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });

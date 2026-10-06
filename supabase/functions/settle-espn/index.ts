@@ -73,7 +73,8 @@ Deno.serve(async (_req: Request) => {
   const { data: pending, error } = await supabase.from("fixtures")
     .select("id, league, home_team, away_team, commence_time")
     .eq("sport", "soccer").eq("status", "scheduled")
-    .lt("commence_time", new Date(now - 3 * 3600000).toISOString())
+    // 1 h 45 min despues del inicio ya puede haber terminado; solo se cierra si ESPN lo marca "completed"
+    .lt("commence_time", new Date(now - 105 * 60000).toISOString())
     .gt("commence_time", new Date(now - 10 * 86400000).toISOString());
   if (error) return new Response(JSON.stringify({ ok: false, error: error.message }), { status: 500 });
 
