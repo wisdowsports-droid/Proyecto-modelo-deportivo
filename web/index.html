@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- version 2026-10-04c -->
+<!-- version 2026-10-06a -->
 <title>Kinetik Picks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
 <meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
@@ -178,6 +178,8 @@
   .mk span{background:var(--surface-2); border-radius:8px; padding:4px 9px; font-size:12.5px; color:var(--ink-2)}
   .mk b{font-family:var(--f-data); color:var(--ink); font-weight:600}
   .mk span.dc{background:var(--win-soft); color:var(--ink)}
+  .apif{margin-top:10px; padding-top:8px; border-top:1px dashed var(--surface-2); font-size:12.5px; color:var(--ink-2); line-height:1.55}
+  .apif b{color:var(--ink); font-weight:600}
   .track{display:flex; gap:8px; align-items:flex-start; background:var(--accent-soft); border-radius:8px; padding:8px 10px; font-size:12.5px; color:var(--ink-2)}
   .track svg{flex:none; width:15px; height:15px; margin-top:2px; color:var(--accent)}
   .track b{font-family:var(--f-data); color:var(--ink); font-weight:600}
@@ -606,6 +608,8 @@
       if (!+s.n) return;
       rec.appendChild(el("div","conf-item", esc(SPORTS[s.sport] || s.sport) + " <b>" + pct(s.h / s.n) + "</b> (" + s.h + "/" + s.n + ")" + (+s.n_alta ? " · alta <b>" + pct(s.h_alta / s.n_alta) + "</b>" : "")));
     });
+    var va = d.vs_apif;
+    if (va && +va.n) rec.appendChild(el("div","conf-item", "Nosotros vs API-Football (ganador): <b>" + va.ours + "</b> vs <b>" + va.theirs + "</b> de " + va.n));
     body.appendChild(rec);
     var up = boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
     document.getElementById("boardMeta").textContent = up.length + " partidos";
@@ -645,6 +649,19 @@
         if (f.cards_exp != null) parts.push('<span>Tarjetas ~<b>' + dec(f.cards_exp) + '</b></span>');
         mk.innerHTML = parts.join("");
         c.appendChild(mk);
+        if (f.apif) {
+          var ax = [], A = f.apif;
+          if (A.lineups && A.lineups.length) ax.push("Alineaciones confirmadas: <b>" + A.lineups.map(function(t){ return esc(t.formation || "?"); }).join(" vs ") + "</b>");
+          if (A.injuries) {
+            if (!A.injuries.length) ax.push("Bajas: <b>ninguna reportada</b>");
+            else {
+              var byT = {}; A.injuries.forEach(function(x){ (byT[x.team] = byT[x.team] || []).push(x.player); });
+              ax.push("Bajas: " + Object.keys(byT).map(function(t){ var l = byT[t]; return "<b>" + esc(t) + "</b> " + l.length + " (" + esc(l.slice(0,3).join(", ")) + (l.length > 3 ? "…" : "") + ")"; }).join(" · "));
+            }
+          }
+          if (A.pred) ax.push("API-Football: L " + pct(+A.pred[0]) + " · E " + pct(+A.pred[1]) + " · V " + pct(+A.pred[2]));
+          if (ax.length) c.appendChild(el("div","apif", ax.join("<br>")));
+        }
         g.appendChild(c);
       });
       day.appendChild(g); body.appendChild(day);
