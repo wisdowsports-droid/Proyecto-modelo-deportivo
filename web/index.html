@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- version 2026-10-06a -->
+<!-- version 2026-10-06b -->
 <title>Kinetik Picks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
 <meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
@@ -287,6 +287,11 @@
     <div id="boardBody"></div>
     <div class="sec-head" style="margin-top:26px"><h2>Resultados de la parrilla · 48 h</h2><span class="meta" id="recentMeta"></span></div>
     <div id="recentBody"></div>
+  </section>
+  <section id="bpval" aria-labelledby="bpvalTitle" hidden>
+    <div class="sec-head"><h2 id="bpvalTitle">Valor en BetPlay <span class="pill pro">Pro</span></h2><span class="meta" id="bpvalMeta"></span></div>
+    <p class="lede">Cuotas de BetPlay más altas que el precio justo de Pinnacle (la casa más precisa del mundo, sin su margen). Es una ventaja estimada, no una garantía: cada señal queda registrada y se mide contra el resultado y contra la línea final de Pinnacle. Se actualiza una vez al día (12:40 p. m.).</p>
+    <div id="bpvalBody"></div>
   </section>
   <section id="free" class="band" aria-labelledby="freeTitle">
     <div class="band-head">
@@ -699,8 +704,43 @@
     } catch(e) {}
   }
 
+  function o2(v){ return (+v).toFixed(2).replace(".", ","); }
+  function bpSel(v){
+    var ln = v.line != null ? String(v.line).replace(".", ",") : "";
+    if (v.market === "1x2") return v.selection === "1" ? "Gana " + v.home : v.selection === "2" ? "Gana " + v.away : "Empate";
+    if (v.market === "totals") return (v.selection === "Over" ? "Más de " : "Menos de ") + ln + " goles";
+    if (v.market === "btts") return "Ambos anotan: " + (v.selection === "Yes" ? "Sí" : "No");
+    return v.selection;
+  }
+  function renderBp(d){
+    if (!d) return;
+    var sec = document.getElementById("bpval"), body = document.getElementById("bpvalBody");
+    sec.hidden = false; body.innerHTML = "";
+    var rc = d.record || {}, up = d.upcoming || [];
+    var meta = up.length + (up.length === 1 ? " señal abierta" : " señales abiertas");
+    if (+rc.n) meta += " · Cerradas " + rc.hits + "/" + rc.n + " · " + (+rc.profit >= 0 ? "+" : "") + String(rc.profit).replace(".", ",") + " u" + (rc.avg_close_edge != null ? " · vs línea final " + (+rc.avg_close_edge >= 0 ? "+" : "") + String(rc.avg_close_edge).replace(".", ",") + " %" : "");
+    document.getElementById("bpvalMeta").textContent = meta;
+    if (!up.length) { body.appendChild(el("div","state-box","Hoy no hay cuotas de BetPlay por encima del precio justo.")); return; }
+    var box = el("div","res-list");
+    up.forEach(function(v){
+      var it = el("div","res");
+      it.appendChild(el("div","mark-ok", "+" + Math.round(+v.edge * 100) + "%"));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", "<b>" + esc(bpSel(v)) + "</b> @ " + o2(+v.bp_price) + ' <span class="sc">justa ' + o2(1 / +v.pin_fair) + "</span>"));
+      var now = v.bp_now != null && +v.bp_now !== +v.bp_price ? " · ahora " + o2(+v.bp_now) + (v.edge_now != null ? " (" + (+v.edge_now >= 0 ? "+" : "") + Math.round(+v.edge_now * 100) + "%)" : "") : "";
+      mid.appendChild(el("div","d", esc(v.home) + " vs " + esc(v.away) + " · " + esc(fmtDay(v.kickoff)) + " " + fmtTime(v.kickoff) + now));
+      it.appendChild(mid); box.appendChild(it);
+    });
+    body.appendChild(box);
+  }
+  async function loadBp(){
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_bp_value"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (r.ok) renderBp(await r.json());
+    } catch(e) {}
+  }
   async function loadMine(){
-    loadBoard();
+    loadBoard(); if (KEY) loadBp();
     if (!KEY) return;
     try {
       var r = await fetch(API.replace("public_free_dashboard", "owner_selection"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
