@@ -185,6 +185,10 @@
   .more{margin-top:14px; display:flex; justify-content:center}
   .more button{padding:9px 18px; border-radius:999px; border:1px solid var(--ink); background:var(--surface); color:var(--ink); font-weight:700; font-size:13.5px; cursor:pointer}
   .more button:hover{background:var(--ink); color:var(--bg)}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px}
+  .chip{padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-weight:600; font-size:13px; cursor:pointer; font-family:inherit}
+  .chip b{font-family:var(--f-data); color:var(--ink-3); margin-left:4px}
+  .chip.on{background:var(--ink); border-color:var(--ink); color:var(--bg)} .chip.on b{color:var(--bg)}
 
   /* resultados */
   .res-list{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px}
@@ -277,7 +281,7 @@
 
   <section id="board" aria-labelledby="boardTitle" hidden>
     <div class="sec-head"><h2 id="boardTitle">Parrilla completa <span class="pill pro">Pro</span></h2><span class="meta" id="boardMeta"></span></div>
-    <p class="lede">Todos los partidos de los próximos 3 días con el pronóstico del modelo: resultado, doble oportunidad, goles, ambos anotan, marcador probable, córners y tarjetas. Solo la ves tú.</p>
+    <p class="lede">Todos los partidos con pronóstico: fútbol (próximos 3 días) con resultado, doble oportunidad, goles, ambos anotan, marcador, córners y tarjetas; tenis, NFL, MLB y baloncesto (próximos 7 días) con el ganador. Solo la ves tú.</p>
     <div id="boardBody"></div>
     <div class="sec-head" style="margin-top:26px"><h2>Resultados de la parrilla · 48 h</h2><span class="meta" id="recentMeta"></span></div>
     <div id="recentBody"></div>
@@ -579,14 +583,33 @@
   }
   /* ---------- parrilla completa (solo con llave) ---------- */
   function pickName(p, h, a){ return p === "Local" ? h : p === "Visitante" ? a : "Empate"; }
+  var SPORTS = { soccer:"Fútbol", tennis:"Tenis", football:"NFL", baseball:"MLB", basketball:"Baloncesto" };
+  var boardData = null, boardSport = "all";
   function renderBoard(d){
     var sec = document.getElementById("board");
     if (!d) { sec.hidden = true; return; }
-    sec.hidden = false;
+    sec.hidden = false; boardData = d;
     var body = document.getElementById("boardBody"); body.innerHTML = "";
-    var up = d.upcoming || [];
+    var all = d.upcoming || [];
+    // filtro por deporte
+    var counts = {}; all.forEach(function(f){ counts[f.sport] = (counts[f.sport] || 0) + 1; });
+    var chips = el("div","chips");
+    [["all","Todos", all.length]].concat(Object.keys(SPORTS).filter(function(s){ return counts[s]; }).map(function(s){ return [s, SPORTS[s], counts[s]]; }))
+      .forEach(function(c){
+        var b = el("button", "chip" + (boardSport === c[0] ? " on" : ""), esc(c[1]) + " <b>" + c[2] + "</b>");
+        b.type = "button"; b.onclick = function(){ boardSport = c[0]; renderBoard(boardData); };
+        chips.appendChild(b);
+      });
+    body.appendChild(chips);
+    var rec = el("div","conf-row"); rec.style.margin = "0 0 14px";
+    (d.bysport || []).forEach(function(s){
+      if (!+s.n) return;
+      rec.appendChild(el("div","conf-item", esc(SPORTS[s.sport] || s.sport) + " <b>" + pct(s.h / s.n) + "</b> (" + s.h + "/" + s.n + ")" + (+s.n_alta ? " · alta <b>" + pct(s.h_alta / s.n_alta) + "</b>" : "")));
+    });
+    body.appendChild(rec);
+    var up = boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
     document.getElementById("boardMeta").textContent = up.length + " partidos";
-    if (!up.length) body.appendChild(el("div","state-box","No hay partidos en los próximos 3 días."));
+    if (!up.length) body.appendChild(el("div","state-box","No hay partidos próximos para este deporte."));
     var days = {}, order = [];
     up.forEach(function(f){ var k = fmtDay(f.commence_time); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
     order.forEach(function(k){
@@ -596,7 +619,7 @@
       days[k].forEach(function(f){
         var c = el("article","fc");
         var top = el("div","fc-top");
-        top.appendChild(el("div","teams", esc(f.home_team) + '<span class="vs">vs</span>' + esc(f.away_team) + '<div class="src">' + esc(lgName(f.league)) + '</div>'));
+        top.appendChild(el("div","teams", esc(f.home_team) + '<span class="vs">vs</span>' + esc(f.away_team) + '<div class="src">' + esc((f.sport !== "soccer" ? (SPORTS[f.sport] || f.sport) + " · " : "") + lgName(f.league)) + '</div>'));
         top.appendChild(el("span","when", fmtTime(f.commence_time)));
         c.appendChild(top);
         var v = el("div","verdict");
@@ -605,9 +628,12 @@
         if (f.confidence) v.appendChild(el("span","conf " + f.confidence, esc(f.confidence)));
         c.appendChild(v);
         var bar = el("div","bar");
-        [["h", f.p_home],["d", f.p_draw],["a", f.p_away]].forEach(function(x){ var s = el("span", x[0]); s.style.width = (+x[1] * 100) + "%"; bar.appendChild(s); });
+        var hasDraw = f.p_draw != null;
+        (hasDraw ? [["h", f.p_home],["d", f.p_draw],["a", f.p_away]] : [["h", f.p_home],["a", f.p_away]]).forEach(function(x){ var s = el("span", x[0]); s.style.width = (+x[1] * 100) + "%"; bar.appendChild(s); });
         c.appendChild(bar);
-        c.appendChild(el("div","bar-l", '<span><i class="dot h"></i>Local <b>' + pct(+f.p_home) + '</b></span><span><i class="dot d"></i>Empate <b>' + pct(+f.p_draw) + '</b></span><span><i class="dot a"></i>Visita <b>' + pct(+f.p_away) + '</b></span>'));
+        c.appendChild(el("div","bar-l", hasDraw
+          ? '<span><i class="dot h"></i>Local <b>' + pct(+f.p_home) + '</b></span><span><i class="dot d"></i>Empate <b>' + pct(+f.p_draw) + '</b></span><span><i class="dot a"></i>Visita <b>' + pct(+f.p_away) + '</b></span>'
+          : '<span><i class="dot h"></i>' + esc(f.home_team) + ' <b>' + pct(+f.p_home) + '</b></span><span><i class="dot a"></i>' + esc(f.away_team) + ' <b>' + pct(+f.p_away) + '</b></span>'));
         var mk = el("div","mk"), parts = [];
         if (f.dc_prob != null) parts.push('<span class="dc">' + esc((f.dc_pick === "1X" ? f.home_team : f.away_team) + " o empate") + ' <b>' + pct(+f.dc_prob) + '</b></span>');
         if (f.over15 != null) parts.push('<span>+1,5 goles <b>' + pct(+f.over15) + '</b></span>');
@@ -641,7 +667,7 @@
       if (r.hit_over15 != null) bits.push("1,5 " + (r.hit_over15 ? "✓" : "✗"));
       if (r.hit_over25 != null) bits.push("2,5 " + (r.hit_over25 ? "✓" : "✗"));
       if (r.hit_btts != null) bits.push("AA " + (r.hit_btts ? "✓" : "✗"));
-      mid.appendChild(el("div","d", bits.join(" · ") + " · " + esc(lgName(r.league))));
+      mid.appendChild(el("div","d", bits.join(" · ") + " · " + esc((r.sport && r.sport !== "soccer" ? (SPORTS[r.sport] || r.sport) + " · " : "") + lgName(r.league))));
       it.appendChild(mid);
       box.appendChild(it);
     });
