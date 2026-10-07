@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { freeCardSvg, resultsCardSvg, svgToPng } from "./card.ts";
 
 // Alertas por Telegram de la "Seleccion del dia".
 // Secreto requerido (Supabase -> Edge Functions -> Secrets): TELEGRAM_BOT_TOKEN
@@ -58,10 +59,192 @@ async function markSent(kind: string, date: string) {
   await supabase.from("telegram_sent").upsert({ kind, ref_date: date });
 }
 
+// ---------- Canal publico (app_settings.tg_channel_id) ----------
+// ch_welcome: mensaje de bienvenida fijado (una sola vez)
+// ch_free:    los picks gratis del dia (una vez al dia)
+// ch_results: resultado de los gratis cuando terminan todos (aciertos y fallos)
+// ch_weekly:  resumen de los ultimos 7 dias (lunes)
+const VOID = new Set(["postponed", "cancelled", "canceled", "abandoned", "void"]);
+const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("es-CO", { timeZone: "America/Bogota", hour: "2-digit", minute: "2-digit" });
+const pctTxt = (h: number, n: number) => (n ? Math.round((100 * h) / n) : 0) + "%";
+const WELCOME = `<b>Bienvenido a Kinetik Picks</b>
+
+Aquí no vendemos humo ni partidos "arreglados". Usamos un modelo estadístico que calcula la probabilidad real de cada resultado, la comparamos con lo que pagan las casas y publicamos todo: <b>los aciertos y también los fallos.</b>
+
+<b>Qué vas a recibir gratis, todos los días</b>
+• <b>6:05 a. m.:</b> los 3 picks de mayor probabilidad del día, cada uno con su porcentaje.
+• <b>En la noche:</b> el resultado de cada pick, marcado con ✓ o ✗, sin borrar nada.
+• <b>Los lunes:</b> el resumen de la semana, con números reales.
+
+<b>Cómo leer un pick</b>
+"Nacional o empate · 87 %" quiere decir que, de cada 100 partidos así, el modelo espera acertar unos 87. Alto no es seguro: 1 de cada 7 u 8 va a fallar, y eso lo vas a ver aquí.
+
+<b>Nuestro historial</b>
+Cada pick queda registrado antes del partido y no se borra. En cada resultado publicamos el acumulado en vivo, y en la página puedes revisar todo el historial.
+
+<b>¿Quieres más?</b>
+La versión Pro trae la Selección completa del día, la parrilla completa de todos los deportes y la calculadora de combinadas. Toca "Quiero el Pro" para entrar a la lista de espera.
+
+<b>Juega con cabeza</b>
+Solo mayores de 18 años. Apuesta montos pequeños y siempre iguales, no persigas pérdidas y nunca apuestes dinero que necesites. Ningún pronóstico garantiza ganancias.`;
+
+// ---------- imagenes para canal y redes ----------
+async function tgPhoto(chat: string, png: Uint8Array, caption: string, kb?: unknown) {
+  const fd = new FormData();
+  fd.append("chat_id", chat);
+  fd.append("photo", new Blob([png], { type: "image/png" }), "kinetik.png");
+  fd.append("caption", caption.length > 1000 ? caption.slice(0, 990) + "…" : caption);
+  fd.append("parse_mode", "HTML");
+  if (kb) fd.append("reply_markup", JSON.stringify(kb));
+  const r = await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: "POST", body: fd });
+  return await r.json();
+}
+const dayLabel = (date: string) => {
+  const w = new Date(date + "T12:00:00Z").toLocaleDateString("es-CO", { weekday: "long", timeZone: "UTC" });
+  return w.charAt(0).toUpperCase() + w.slice(1) + " " + ddmm(date);
+};
+const shortLeague = (l: string) => String(l ?? "").replace(/\s*\(.*\)\s*/, "").trim();
+const pickLabel = (p: any) => String(p.label ?? ((p.dc_pick === "1X" ? p.home_team : p.away_team) + " o empate")).replace(/\s*\(tenis\)$/, "");
+async function freeCard(date: string, rows: any[]) {
+  return await svgToPng(freeCardSvg(dayLabel(date), rows.map((p: any) => ({
+    home: p.home_team, away: p.away_team, time: hhmm(p.commence_time), league: shortLeague(p.league), label: pickLabel(p), prob: +p.dc_prob,
+  }))));
+}
+async function resultsCard(date: string, rows: any[], h: number, n: number, H: number, N: number) {
+  return await svgToPng(resultsCardSvg(dayLabel(date), rows.map((p: any) => ({
+    home: p.home_team, away: p.away_team, label: pickLabel(p), score: p.home_score != null ? `${p.home_score}-${p.away_score}` : null, hit: p.hit,
+  })), h, n, H, N));
+}
+// copia de la imagen al chat privado del dueno, lista para compartir en estados / reels
+async function ownerCopy(png: Uint8Array, caption: string) {
+  const { data } = await supabase.from("app_settings").select("value").eq("key", "telegram_chat_id").maybeSingle();
+  if (data?.value) await tgPhoto(data.value, png, caption);
+}
+
+async function channel(mode: string) {
+  const { data: cfgRows } = await supabase.from("app_settings").select("key, value").in("key", ["tg_channel_id", "public_url"]);
+  const cfg: Record<string, string> = Object.fromEntries((cfgRows ?? []).map((r: any) => [r.key, r.value]));
+  const ch = cfg.tg_channel_id;
+  if (!ch) return json({ ok: false, error: "Falta tg_channel_id en app_settings" }, 400);
+  const pub = cfg.public_url ?? "https://kinetikpicks.vercel.app/";
+  const kb = { inline_keyboard: [[{ text: "📊 Ver en la página", url: pub }], [{ text: "⭐ Quiero el Pro", url: "https://t.me/Kinetikpicks_alertas_bot?start=pro" }]] };
+  const post = (text: string) => tg("sendMessage", { chat_id: ch, text, parse_mode: "HTML", disable_web_page_preview: true, reply_markup: kb });
+
+  if (mode === "ch_welcome") {
+    if (await alreadySent("ch_welcome", "2000-01-01")) return json({ ok: true, skipped: "ya publicado" });
+    const r = await post(WELCOME);
+    if (r.ok) {
+      await markSent("ch_welcome", "2000-01-01");
+      const p = await tg("pinChatMessage", { chat_id: ch, message_id: r.result.message_id, disable_notification: true });
+      return json({ ok: true, publicado: true, fijado: p.ok ? true : p.description });
+    }
+    return json({ ok: false, telegram: r.description });
+  }
+
+  if (mode === "ch_welcome_edit") {
+    const info = await tg("getChat", { chat_id: ch });
+    const mid = info?.result?.pinned_message?.message_id;
+    if (!mid) return json({ ok: false, error: "no hay mensaje fijado" }, 400);
+    const r = await tg("editMessageText", { chat_id: ch, message_id: mid, text: WELCOME, parse_mode: "HTML", disable_web_page_preview: true, reply_markup: kb });
+    return json({ ok: r.ok, telegram: r.ok ? "actualizado" : r.description });
+  }
+
+  if (mode === "ch_free") {
+    const date = bogotaDate();
+    if (await alreadySent("ch_free", date)) return json({ ok: true, skipped: "ya publicado" });
+    const { data: rows } = await supabase.from("free_picks").select("*").eq("pick_date", date).order("commence_time");
+    if (!rows?.length) return json({ ok: true, skipped: "sin picks gratis hoy" });
+    const lines = rows.map((p: any, i: number) => {
+      const label = p.label ?? ((p.dc_pick === "1X" ? p.home_team : p.away_team) + " o empate");
+      return `<b>${i + 1}.</b> ${esc(p.home_team)} vs ${esc(p.away_team)} · ${hhmm(p.commence_time)}\n    <b>${esc(label)}</b> · ${Math.round(+p.dc_prob * 100)}%`;
+    });
+    const text = `🎯 <b>Gratis de hoy · ${ddmm(date)}</b>\n\n${lines.join("\n\n")}\n\n<i>Probabilidad según nuestro modelo. Alto no es seguro: esta noche publicamos el resultado, acierte o falle.</i>`;
+    let r: any, img = "no";
+    try {
+      const png = await freeCard(date, rows);
+      r = await tgPhoto(ch, png, text, kb); img = "si";
+      if (r.ok) await ownerCopy(png, "📲 Imagen de hoy para compartir en estados y redes");
+    } catch (e) { r = await post(text); img = "error: " + String(e).slice(0, 120); }
+    if (r.ok) await markSent("ch_free", date);
+    return json({ ok: r.ok, picks: rows.length, imagen: img, telegram: r.ok ? "publicado" : r.description });
+  }
+
+  if (mode === "ch_results") {
+    const out: any[] = [];
+    for (const date of [bogotaDate(-1), bogotaDate()]) {
+      if (await alreadySent("ch_results", date)) { out.push({ date, skipped: "ya publicado" }); continue; }
+      if (!(await alreadySent("ch_free", date))) { out.push({ date, skipped: "no se publicaron gratis ese dia" }); continue; }
+      const { data: rows } = await supabase.from("free_picks_results").select("*").eq("pick_date", date).order("commence_time");
+      if (!rows?.length) { out.push({ date, skipped: "sin picks" }); continue; }
+      const pending = rows.filter((r: any) => r.hit == null && !VOID.has(String(r.status))).length;
+      if (pending) { out.push({ date, skipped: `${pending} pendientes` }); continue; }
+      const graded = rows.filter((r: any) => r.hit != null);
+      const h = graded.filter((r: any) => r.hit).length;
+      const lines = rows.map((p: any) => {
+        const label = p.label ?? ((p.dc_pick === "1X" ? p.home_team : p.away_team) + " o empate");
+        const icon = p.hit == null ? "➖" : p.hit ? "✅" : "❌";
+        const sc = p.home_score != null ? ` · <b>${p.home_score}-${p.away_score}</b>` : " · anulado";
+        return `${icon} ${esc(p.home_team)} vs ${esc(p.away_team)} · ${esc(label)}${sc}`;
+      });
+      const { data: all } = await supabase.from("free_picks_results").select("hit").not("hit", "is", null);
+      const N = all?.length ?? 0, H = (all ?? []).filter((r: any) => r.hit).length;
+      const text = `📊 <b>Gratis del ${ddmm(date)}: ${h} de ${graded.length}</b>\n\n${lines.join("\n")}\n\nEn vivo desde el inicio: <b>${H} de ${N} (${pctTxt(H, N)})</b>`;
+      let r: any, img = "no";
+      try {
+        const png = await resultsCard(date, rows, h, graded.length, H, N);
+        r = await tgPhoto(ch, png, text, kb); img = "si";
+        if (r.ok) await ownerCopy(png, "📲 Resultados para compartir en estados y redes");
+      } catch (e) { r = await post(text); img = "error: " + String(e).slice(0, 120); }
+      if (r.ok) await markSent("ch_results", date);
+      out.push({ date, imagen: img, telegram: r.ok ? "publicado" : r.description });
+    }
+    return json({ ok: true, out });
+  }
+
+  if (mode === "ch_weekly") {
+    const date = bogotaDate();
+    if (await alreadySent("ch_weekly", date)) return json({ ok: true, skipped: "ya publicado" });
+    const from = bogotaDate(-7), to = bogotaDate(-1);
+    const { data: fr } = await supabase.from("free_picks_results").select("hit").gte("pick_date", from).lte("pick_date", to).not("hit", "is", null);
+    const { data: sr } = await supabase.from("selection_results").select("hit").gte("pick_date", from).lte("pick_date", to).not("hit", "is", null);
+    const fn = fr?.length ?? 0, fh = (fr ?? []).filter((r: any) => r.hit).length;
+    const sn = sr?.length ?? 0, sh = (sr ?? []).filter((r: any) => r.hit).length;
+    if (!fn && !sn) return json({ ok: true, skipped: "sin datos de la semana" });
+    const text = `🗓 <b>Así nos fue · ${ddmm(from)} al ${ddmm(to)}</b>\n\n` +
+      (fn ? `Picks gratis: <b>${fh} de ${fn} (${pctTxt(fh, fn)})</b>\n` : "") +
+      (sn ? `Selección Pro: <b>${sh} de ${sn} (${pctTxt(sh, sn)})</b>\n` : "") +
+      `\n<i>Todo publicado: aciertos y fallos. Nada se borra.</i>`;
+    const r = await post(text);
+    if (r.ok) await markSent("ch_weekly", date);
+    return json({ ok: r.ok, telegram: r.ok ? "publicado" : r.description });
+  }
+  if (mode === "ch_preview") {
+    // prueba: arma ambas tarjetas con los ultimos datos y las manda SOLO al chat privado del dueno
+    const { data: lastF } = await supabase.from("free_picks").select("pick_date").order("pick_date", { ascending: false }).limit(1);
+    const out: any = {};
+    if (lastF?.length) {
+      const d = lastF[0].pick_date;
+      const { data: rows } = await supabase.from("free_picks").select("*").eq("pick_date", d).order("commence_time");
+      try { await ownerCopy(await freeCard(d, rows ?? []), "Vista previa · Gratis de hoy"); out.free = "enviada"; } catch (e) { out.free = String(e).slice(0, 200); }
+      const { data: res } = await supabase.from("free_picks_results").select("*").eq("pick_date", d).order("commence_time");
+      const { data: all } = await supabase.from("free_picks_results").select("hit").not("hit", "is", null);
+      const g = (res ?? []).filter((r: any) => r.hit != null);
+      try {
+        await ownerCopy(await resultsCard(d, res ?? [], g.filter((r: any) => r.hit).length, g.length, (all ?? []).filter((r: any) => r.hit).length, all?.length ?? 0), "Vista previa · Así nos fue");
+        out.results = "enviada";
+      } catch (e) { out.results = String(e).slice(0, 200); }
+    }
+    return json({ ok: true, out });
+  }
+  return json({ ok: false, error: "modo de canal desconocido" }, 400);
+}
+
 Deno.serve(async (req: Request) => {
   if (!TOKEN) return json({ ok: false, error: "Falta el secreto TELEGRAM_BOT_TOKEN en Supabase (Edge Functions -> Secrets)." }, 400);
   let mode = "results";
   try { const b = await req.json(); if (b?.mode) mode = b.mode; } catch (_e) { /* default */ }
+
+  if (mode.startsWith("ch_")) return await channel(mode);
 
   const chat = await chatId();
   if (!chat) return json({ ok: false, error: lastUpdatesError ?? "No encontre tu chat. Abre tu bot en Telegram y escribele /start, luego intenta de nuevo." }, 400);
