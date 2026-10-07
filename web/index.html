@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- version 2026-10-06b -->
+<!-- version 2026-10-07a -->
 <title>Kinetik Picks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
 <meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
@@ -180,6 +180,14 @@
   .mk span.dc{background:var(--win-soft); color:var(--ink)}
   .apif{margin-top:10px; padding-top:8px; border-top:1px dashed var(--surface-2); font-size:12.5px; color:var(--ink-2); line-height:1.55}
   .apif b{color:var(--ink); font-weight:600}
+  .calc{display:flex; flex-direction:column; gap:12px}
+  .calc-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .calc select,.calc input{flex:1 1 180px; min-width:0; background:var(--surface-2); color:var(--ink); border:1px solid var(--surface-2); border-radius:10px; padding:9px 10px; font:inherit; font-size:14px}
+  .calc label{font-size:13px; color:var(--ink-2)}
+  .calc-out{background:var(--surface-2); border-radius:12px; padding:14px; font-size:14px; color:var(--ink-2); line-height:1.6}
+  .calc-out b{color:var(--ink)}
+  .calc-out .big{font-family:var(--f-data); font-size:26px; color:var(--ink); font-weight:700}
+  .res .rm{margin-left:auto; background:none; border:0; color:var(--ink-2); font-size:18px; cursor:pointer; padding:0 6px}
   .track{display:flex; gap:8px; align-items:flex-start; background:var(--accent-soft); border-radius:8px; padding:8px 10px; font-size:12.5px; color:var(--ink-2)}
   .track svg{flex:none; width:15px; height:15px; margin-top:2px; color:var(--accent)}
   .track b{font-family:var(--f-data); color:var(--ink); font-weight:600}
@@ -281,6 +289,16 @@
     <div class="mine-rec" id="mineRecent"></div>
   </section>
 
+  <section id="calc" aria-labelledby="calcTitle" hidden>
+    <div class="sec-head"><h2 id="calcTitle">Calculadora de combinadas <span class="pill pro">Pro</span></h2><span class="meta" id="calcMeta"></span></div>
+    <p class="lede">Arma tu combinada con los partidos de la parrilla y escribe la cuota total que te paga la casa. Te decimos la probabilidad real según nuestro modelo y si esa cuota la paga bien o mal.</p>
+    <div class="calc">
+      <div class="calc-row"><select id="cMatch" aria-label="Partido"></select><select id="cMarket" aria-label="Mercado"></select><button type="button" class="chip on" id="cAdd">Agregar</button></div>
+      <div id="cLegs" class="res-list"></div>
+      <div class="calc-row"><label for="cOdds">Cuota total de la casa</label><input id="cOdds" type="number" inputmode="decimal" step="0.01" min="1" placeholder="Ej. 7,88"></div>
+      <div id="cOut" class="calc-out"></div>
+    </div>
+  </section>
   <section id="board" aria-labelledby="boardTitle" hidden>
     <div class="sec-head"><h2 id="boardTitle">Parrilla completa <span class="pill pro">Pro</span></h2><span class="meta" id="boardMeta"></span></div>
     <p class="lede">Todos los partidos con pronóstico: fútbol (próximos 3 días) con resultado, doble oportunidad, goles, ambos anotan, marcador, córners y tarjetas; tenis, NFL, MLB y baloncesto (próximos 7 días) con el ganador. Solo la ves tú.</p>
@@ -671,6 +689,7 @@
       });
       day.appendChild(g); body.appendChild(day);
     });
+    renderCalc(all);
     // resultados 48 h
     var rb = document.getElementById("recentBody"); rb.innerHTML = "";
     var rec = d.recent || [];
@@ -678,6 +697,9 @@
         ndc = rec.filter(function(r){ return r.hit_dc != null; }).length, hdc = rec.filter(function(r){ return r.hit_dc; }).length;
     document.getElementById("recentMeta").textContent = n ? ("Resultado " + h1 + "/" + n + " · Doble oport. " + hdc + "/" + ndc) : "";
     if (!n) { rb.appendChild(el("div","state-box","Todavía no hay partidos calificados en las últimas 48 horas.")); return; }
+    // orden: primero los aciertos, luego los que fallaron el ganador pero acertaron otro mercado, al final el resto
+    var score = function(r){ return r.hit_result ? 2 : (r.hit_dc || r.hit_over15 || r.hit_over25 || r.hit_btts) ? 1 : 0; };
+    rec = rec.map(function(r, i){ return [r, i]; }).sort(function(a, b){ return score(b[0]) - score(a[0]) || a[1] - b[1]; }).map(function(x){ return x[0]; });
     var box = el("div","res-list");
     rec.forEach(function(r){
       var it = el("div","res");
@@ -704,6 +726,73 @@
     } catch(e) {}
   }
 
+  var calcLegs = [], calcMatches = [];
+  function calcMarkets(f){
+    if (f.sport !== "soccer") return [["Gana " + f.home_team, +f.p_home], ["Gana " + f.away_team, +f.p_away]];
+    var m = [["Gana " + f.home_team, +f.p_home], ["Empate", +f.p_draw], ["Gana " + f.away_team, +f.p_away],
+      [f.home_team + " o empate", +f.p_home + +f.p_draw], [f.away_team + " o empate", +f.p_draw + +f.p_away]];
+    if (f.over15 != null) m.push(["Más de 1,5 goles", +f.over15]);
+    if (f.over25 != null) { m.push(["Más de 2,5 goles", +f.over25]); m.push(["Menos de 2,5 goles", 1 - f.over25]); }
+    if (f.over35 != null) m.push(["Menos de 3,5 goles", 1 - f.over35]);
+    if (f.btts != null) { m.push(["Ambos anotan: Sí", +f.btts]); m.push(["Ambos anotan: No", 1 - f.btts]); }
+    return m.filter(function(x){ return x[1] > 0 && x[1] < 1; });
+  }
+  function fillCalcMarkets(){
+    var f = calcMatches[+document.getElementById("cMatch").value], sel = document.getElementById("cMarket");
+    sel.innerHTML = "";
+    if (!f) return;
+    calcMarkets(f).forEach(function(m, i){ var o = document.createElement("option"); o.value = i; o.textContent = m[0] + " · " + pct(m[1]); sel.appendChild(o); });
+  }
+  function drawCalc(){
+    var box = document.getElementById("cLegs"), out = document.getElementById("cOut");
+    box.innerHTML = "";
+    calcLegs.forEach(function(l, i){
+      var it = el("div","res");
+      it.appendChild(el("div","mark-ok", pct(l.p)));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", "<b>" + esc(l.label) + "</b>"));
+      mid.appendChild(el("div","d", esc(l.match)));
+      it.appendChild(mid);
+      var rm = el("button","rm","×"); rm.type = "button"; rm.setAttribute("aria-label","Quitar");
+      rm.onclick = function(){ calcLegs.splice(i, 1); drawCalc(); };
+      it.appendChild(rm); box.appendChild(it);
+    });
+    if (!calcLegs.length) { out.innerHTML = "Agrega al menos una selección."; return; }
+    var p = calcLegs.reduce(function(a, l){ return a * l.p; }, 1), fair = 1 / p;
+    var odds = parseFloat(String(document.getElementById("cOdds").value).replace(",", "."));
+    var h = '<div class="big">' + pct(p) + '</div>Probabilidad real de que salga: <b>1 de cada ' + Math.max(1, Math.round(1 / p)) + '</b> veces · cuota justa <b>' + fair.toFixed(2).replace(".", ",") + '</b>';
+    if (odds > 1) {
+      var ev = p * odds - 1;
+      h += '<br>Con cuota <b>' + odds.toFixed(2).replace(".", ",") + '</b>: ' + (ev >= 0
+        ? '<b style="color:var(--win)">la casa paga bien</b> (a la larga +' + Math.round(ev * 100) + ' por cada 100 apostados)'
+        : '<b style="color:var(--loss)">la casa paga mal</b> (a la larga ' + Math.round(ev * 100) + ' por cada 100 apostados)');
+    }
+    if (calcLegs.length > 2) h += '<br>Cada selección que agregas multiplica el margen de la casa. Con 1 o 2 selecciones fuertes (85 %+) tienes más opciones.';
+    h += '<br><span style="font-size:12px">Supone que los partidos son independientes entre sí.</span>';
+    out.innerHTML = h;
+  }
+  function renderCalc(all){
+    var sec = document.getElementById("calc"); if (!sec) return;
+    sec.hidden = false;
+    var now = Date.now();
+    calcMatches = all.filter(function(f){ return Date.parse(f.commence_time) > now && f.p_home != null; })
+      .sort(function(a, b){ return Date.parse(a.commence_time) - Date.parse(b.commence_time); });
+    var sel = document.getElementById("cMatch"); sel.innerHTML = "";
+    calcMatches.forEach(function(f, i){ var o = document.createElement("option"); o.value = i;
+      o.textContent = f.home_team + " vs " + f.away_team + " · " + fmtDay(f.commence_time) + " " + fmtTime(f.commence_time); sel.appendChild(o); });
+    sel.onchange = fillCalcMarkets; fillCalcMarkets();
+    document.getElementById("cAdd").onclick = function(){
+      var f = calcMatches[+sel.value]; if (!f) return;
+      var key = f.home_team + "|" + f.away_team + "|" + f.commence_time;
+      if (calcLegs.some(function(l){ return l.key === key; })) { document.getElementById("cOut").innerHTML = "Ese partido ya está en la combinada (dos mercados del mismo partido no son independientes)."; return; }
+      var m = calcMarkets(f)[+document.getElementById("cMarket").value]; if (!m) return;
+      calcLegs.push({ key: key, label: m[0], p: m[1], match: f.home_team + " vs " + f.away_team + " · " + fmtDay(f.commence_time) });
+      drawCalc();
+    };
+    document.getElementById("cOdds").oninput = drawCalc;
+    document.getElementById("calcMeta").textContent = calcMatches.length + " partidos disponibles";
+    drawCalc();
+  }
   function o2(v){ return (+v).toFixed(2).replace(".", ","); }
   function bpSel(v){
     var ln = v.line != null ? String(v.line).replace(".", ",") : "";
