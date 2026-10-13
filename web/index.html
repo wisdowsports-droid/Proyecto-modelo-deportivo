@@ -1,445 +1,866 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Crujiente Light | Lechona Colombiana a Domicilio y para Eventos</title>
-<meta name="description" content="El Crujiente Light: lechona colombiana artesanal para cumpleaños, reuniones familiares y eventos empresariales. Pide por WhatsApp y recíbela crujiente, sabrosa y a tiempo.">
-<meta name="keywords" content="lechona, lechona colombiana, lechona para eventos, lechona para cumpleaños, lechona a domicilio, pedir lechona">
-<link rel="canonical" href="https://www.elcrujientelight.com/">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="El Crujiente Light | Tradición que Cruje">
-<meta property="og:description" content="Lechona colombiana artesanal para tus eventos y antojos. Pide por WhatsApp.">
-<meta property="og:image" content="images/og-lechona.jpg">
-<meta property="og:locale" content="es_CO">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- version 2026-10-07b -->
+<title>Kinetik Picks</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
+<meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
+<meta name="theme-color" content="#0C1B33">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: centro de partidos. Franja nocturna con los gratis del dia arriba (el gancho), récord en vivo, parrilla Pro por dia y liga, resultados y prueba histórica al final. */
+  :root{
+    --bg:#F2F4F7; --surface:#FFFFFF; --surface-2:#E9EDF2; --line:#D8DEE6;
+    --ink:#0C1726; --ink-2:#4A5668; --ink-3:#6F7A8C;
+    --accent:#1E4FD8; --accent-soft:#E4EBFC;
+    --band:#0C1B33; --band-2:#13274A; --band-line:#22386140; --band-ink:#F2F5FA; --band-muted:#A9B8CF;
+    --win:#0E8A5A; --win-soft:#DDF3E9; --loss:#C23B2A; --loss-soft:#F9E3DF;
+    --mid:#8F6200; --mid-soft:#FBF0D6; --low:#56627A; --low-soft:#E9EDF2;
+    --gold:#B8871F; --gold-soft:#F8EDD2;
+    --home:#1E4FD8; --draw:#9AA6B8; --away:#E0752D;
+    --f-display:"Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+    --f-body:"Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-data:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --r:12px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A111C; --surface:#111A28; --surface-2:#172234; --line:#243149;
+      --ink:#EAF0F8; --ink-2:#A7B3C5; --ink-3:#8491A5;
+      --accent:#7B98FF; --accent-soft:#1A2446;
+      --band:#0F2140; --band-2:#16305A; --band-line:#3A558A55; --band-ink:#EEF3FB; --band-muted:#9FB2D0;
+      --win:#3CCB8F; --win-soft:#0F2A20; --loss:#F07A66; --loss-soft:#2F1814;
+      --mid:#E9B949; --mid-soft:#2B2311; --low:#A7B3C5; --low-soft:#1A2436;
+      --gold:#E3B85A; --gold-soft:#2C2412;
+      --home:#7B98FF; --draw:#5C6A80; --away:#F2944F;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A111C; --surface:#111A28; --surface-2:#172234; --line:#243149;
+    --ink:#EAF0F8; --ink-2:#A7B3C5; --ink-3:#8491A5;
+    --accent:#7B98FF; --accent-soft:#1A2446;
+    --band:#0F2140; --band-2:#16305A; --band-line:#3A558A55; --band-ink:#EEF3FB; --band-muted:#9FB2D0;
+    --win:#3CCB8F; --win-soft:#0F2A20; --loss:#F07A66; --loss-soft:#2F1814;
+    --mid:#E9B949; --mid-soft:#2B2311; --low:#A7B3C5; --low-soft:#1A2436;
+    --gold:#E3B85A; --gold-soft:#2C2412;
+    --home:#7B98FF; --draw:#5C6A80; --away:#F2944F;
+    color-scheme: dark;
+  }
 
-<link rel="stylesheet" href="styles.css">
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.45; margin:0; padding-top:env(safe-area-inset-top,0px)}
+  .wrap{max-width:1120px; margin:0 auto; padding-inline:16px}
+  h1,h2,h3{font-family:var(--f-display); font-weight:700; letter-spacing:.01em; text-wrap:balance; margin:0; line-height:1.1}
+  .num{font-family:var(--f-data); font-variant-numeric:tabular-nums}
+  button{font-family:inherit}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* cabecera */
+  header.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--bg); border-bottom:1px solid var(--line)}
+  header.top .wrap{display:flex; flex-direction:column; gap:10px; padding-block:12px 10px}
+  .brand-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .brand{display:flex; align-items:center; gap:10px; min-width:0}
+  .mark{width:34px; height:34px; border-radius:9px; background:var(--band); display:flex; align-items:center; justify-content:center; flex:none}
+  .mark svg{width:20px; height:20px}
+  .brand h1{font-size:24px; text-transform:uppercase; letter-spacing:.03em}
+  .brand .tag{font-size:12px; color:var(--ink-3)}
+  .live{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-3); white-space:nowrap}
+  .live i{width:7px; height:7px; border-radius:50%; background:var(--win); box-shadow:0 0 0 3px var(--win-soft)}
+  .filters{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px}
+  .filters::-webkit-scrollbar{display:none}
+  .chip{flex:none; padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-size:13px; font-weight:600; cursor:pointer}
+  .chip:hover{border-color:var(--accent); color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+
+  main{display:flex; flex-direction:column; gap:36px; padding-block:22px 36px}
+  .sec-head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap}
+  .sec-head h2{font-size:26px; text-transform:uppercase; letter-spacing:.02em; display:flex; align-items:center; gap:10px}
+  .meta{font-size:12.5px; color:var(--ink-3)}
+  .lede{font-size:14px; color:var(--ink-2); margin:-4px 0 14px; max-width:68ch}
+  .pill{font-family:var(--f-body); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:999px}
+  .pill.pro{background:var(--gold-soft); color:var(--gold); border:1px solid var(--gold)}
+  .pill.free{background:var(--win); color:#FFFFFF}
+  .pill.hist{border:1px dashed var(--ink-3); color:var(--ink-2)}
+
+  /* franja gratis */
+  .band{background:var(--band); color:var(--band-ink); border-radius:18px; padding:22px 22px 18px; display:flex; flex-direction:column; gap:16px; position:relative; overflow:hidden}
+  .band::after{content:""; position:absolute; right:-80px; top:-80px; width:260px; height:260px; border-radius:50%; border:2px solid var(--band-line); pointer-events:none}
+  .band::before{content:""; position:absolute; right:-10px; top:-10px; width:120px; height:120px; border-radius:50%; border:2px solid var(--band-line); pointer-events:none}
+  .band-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; position:relative; z-index:1}
+  .band h2{font-size:30px; text-transform:uppercase; letter-spacing:.02em}
+  .band .sub{color:var(--band-muted); font-size:14px; margin-top:4px; max-width:60ch}
+  .band-stats{display:flex; gap:22px; flex-wrap:wrap}
+  .bstat .v{font-family:var(--f-data); font-size:26px; font-weight:600; line-height:1}
+  .bstat .l{font-size:11.5px; color:var(--band-muted); margin-top:4px; max-width:22ch}
+  .free-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; position:relative; z-index:1}
+  @media (max-width:860px){ .free-grid{grid-template-columns:minmax(0,1fr)} }
+  .fp{background:var(--band-2); border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; min-width:0}
+  .fp-top{display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--band-muted)}
+  .fp-top .num{white-space:nowrap; flex:none}
+  .fp-top .lg{text-transform:uppercase; letter-spacing:.06em; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .fp-teams{font-weight:600; font-size:15px}
+  .fp-teams .vs{color:var(--band-muted); font-weight:400; padding:0 5px}
+  .fp-pick{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+  .fp-pick .what{font-family:var(--f-display); font-size:22px; font-weight:700; line-height:1.05}
+  .fp-pick .p{font-family:var(--f-data); font-size:26px; font-weight:600}
+  .fp-state{font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; align-self:flex-start; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.1); color:var(--band-ink)}
+  .fp-state.ok{background:var(--win); color:#FFFFFF}
+  .fp-state.no{background:var(--loss); color:#FFFFFF}
+  .band-empty{background:var(--band-2); border-radius:14px; padding:18px; color:var(--band-muted); font-size:14px; position:relative; z-index:1}
+  .band-foot{font-size:12px; color:var(--band-muted); position:relative; z-index:1}
+
+  /* selección del día */
+  .sel-list{display:flex; flex-direction:column; gap:8px}
+  .sel{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px 16px}
+  .sel .rk{font-family:var(--f-display); font-size:28px; font-weight:700; color:var(--ink-3); width:26px; text-align:center}
+  .sel .mid{min-width:0; display:flex; flex-direction:column; gap:3px}
+  .sel .lg{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); font-weight:600}
+  .sel .tm{font-size:14px; font-weight:600}
+  .sel .what{font-family:var(--f-display); font-size:20px; font-weight:700; line-height:1.1}
+  .sel .right{display:flex; flex-direction:column; align-items:flex-end; gap:4px; text-align:right}
+  .sel .p{font-family:var(--f-data); font-size:24px; font-weight:600; color:var(--accent)}
+  .sel .odds{font-size:12px; color:var(--ink-2); white-space:nowrap}
+  .sel .odds b{font-family:var(--f-data); color:var(--ink)}
+  .sel .st{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-2)}
+  .sel .st.ok{background:var(--win-soft); color:var(--win)} .sel .st.no{background:var(--loss-soft); color:var(--loss)}
+  .sel.void{opacity:.6}
+  @media (max-width:560px){ .sel{grid-template-columns:auto minmax(0,1fr)} .sel .right{grid-column:2; align-items:flex-start; text-align:left; flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px} }
+  .rule{background:var(--accent-soft); border-radius:10px; padding:10px 14px; font-size:13px; color:var(--ink-2); margin-top:10px}
+  .rule b{color:var(--ink)}
+
+  /* récord */
+  .kpis{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+  @media (max-width:760px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .kpi{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; min-width:0}
+  .kpi .l{font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.07em; font-weight:600}
+  .kpi .v{font-family:var(--f-data); font-size:30px; font-weight:600; margin-top:6px; line-height:1}
+  .kpi .s{font-size:12px; color:var(--ink-2); margin-top:6px}
+  .kpi .meter{height:4px; background:var(--surface-2); border-radius:2px; margin-top:10px; position:relative}
+  .kpi .meter span{position:absolute; left:0; top:0; bottom:0; border-radius:2px; background:var(--accent)}
+  .kpi .meter em{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink-3)}
+  .conf-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+  .conf-item{display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:8px 12px; font-size:13px; color:var(--ink-2)}
+  .conf-item b{font-family:var(--f-data); color:var(--ink)}
+  .conf{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:3px 8px; border-radius:999px; white-space:nowrap}
+  .conf.alta{background:var(--win-soft); color:var(--win)} .conf.media{background:var(--mid-soft); color:var(--mid)} .conf.baja{background:var(--low-soft); color:var(--low)}
+
+  /* parrilla */
+  .day{display:flex; flex-direction:column; gap:10px}
+  .day + .day{margin-top:22px}
+  .day-title{display:flex; align-items:baseline; gap:10px; font-family:var(--f-display); font-size:19px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding-bottom:6px; border-bottom:2px solid var(--ink)}
+  .day-title .n{font-family:var(--f-body); font-size:12.5px; font-weight:500; color:var(--ink-3); text-transform:none; letter-spacing:0}
+  .league{display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-2); margin-top:6px}
+  .league::after{content:""; flex:1; height:1px; background:var(--line)}
+  .grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+  @media (max-width:780px){ .grid{grid-template-columns:minmax(0,1fr)} }
+
+  .fc{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px; min-width:0; display:flex; flex-direction:column; gap:11px}
+  .fc-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+  .teams{font-weight:600; font-size:15px; min-width:0}
+  .teams .vs{color:var(--ink-3); font-weight:400; padding:0 5px}
+  .when{font-size:12px; color:var(--ink-3); white-space:nowrap; font-family:var(--f-data)}
+  .verdict{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .verdict .pick{font-family:var(--f-display); font-size:22px; font-weight:700; line-height:1.05}
+  .verdict .pct{font-family:var(--f-data); font-size:20px; font-weight:600; color:var(--accent)}
+  .bar{display:flex; height:8px; border-radius:4px; overflow:hidden; background:var(--surface-2); gap:2px}
+  .bar span{height:100%} .bar .h{background:var(--home)} .bar .d{background:var(--draw)} .bar .a{background:var(--away)}
+  .bar-l{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-2); margin-top:5px; gap:6px}
+  .bar-l span{display:flex; align-items:center; gap:5px; min-width:0}
+  .bar-l b{font-family:var(--f-data); color:var(--ink); font-weight:600}
+  .dot{width:8px; height:8px; border-radius:2px; flex:none} .dot.h{background:var(--home)} .dot.d{background:var(--draw)} .dot.a{background:var(--away)}
+  .mk{display:flex; flex-wrap:wrap; gap:6px}
+  .mk span{background:var(--surface-2); border-radius:8px; padding:4px 9px; font-size:12.5px; color:var(--ink-2)}
+  .mk b{font-family:var(--f-data); color:var(--ink); font-weight:600}
+  .mk span.dc{background:var(--win-soft); color:var(--ink)}
+  .apif{margin-top:10px; padding-top:8px; border-top:1px dashed var(--surface-2); font-size:12.5px; color:var(--ink-2); line-height:1.55}
+  .apif b{color:var(--ink); font-weight:600}
+  .calc{display:flex; flex-direction:column; gap:12px}
+  .calc-row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .calc select,.calc input{flex:1 1 180px; min-width:0; background:var(--surface-2); color:var(--ink); border:1px solid var(--surface-2); border-radius:10px; padding:9px 10px; font:inherit; font-size:14px}
+  .calc label{font-size:13px; color:var(--ink-2)}
+  .calc-out{background:var(--surface-2); border-radius:12px; padding:14px; font-size:14px; color:var(--ink-2); line-height:1.6}
+  .calc-out b{color:var(--ink)}
+  .calc-out .big{font-family:var(--f-data); font-size:26px; color:var(--ink); font-weight:700}
+  .res .rm{margin-left:auto; background:none; border:0; color:var(--ink-2); font-size:18px; cursor:pointer; padding:0 6px}
+  .track{display:flex; gap:8px; align-items:flex-start; background:var(--accent-soft); border-radius:8px; padding:8px 10px; font-size:12.5px; color:var(--ink-2)}
+  .track svg{flex:none; width:15px; height:15px; margin-top:2px; color:var(--accent)}
+  .track b{font-family:var(--f-data); color:var(--ink); font-weight:600}
+  .src{font-size:11.5px; color:var(--ink-3)}
+  .more{margin-top:14px; display:flex; justify-content:center}
+  .more button{padding:9px 18px; border-radius:999px; border:1px solid var(--ink); background:var(--surface); color:var(--ink); font-weight:700; font-size:13.5px; cursor:pointer}
+  .more button:hover{background:var(--ink); color:var(--bg)}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px}
+  .chip{padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-weight:600; font-size:13px; cursor:pointer; font-family:inherit}
+  .chip b{font-family:var(--f-data); color:var(--ink-3); margin-left:4px}
+  .chip.on{background:var(--ink); border-color:var(--ink); color:var(--bg)} .chip.on b{color:var(--bg)}
+
+  /* resultados */
+  .res-list{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px}
+  @media (max-width:780px){ .res-list{grid-template-columns:minmax(0,1fr)} }
+  .res{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:9px 12px}
+  .mark-ok,.mark-no{width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px}
+  .mark-ok{background:var(--win-soft); color:var(--win)} .mark-no{background:var(--loss-soft); color:var(--loss)}
+  .res .t{font-size:13.5px; font-weight:600; min-width:0}
+  .res .d{font-size:12px; color:var(--ink-3)}
+  .res .sc{font-family:var(--f-data); font-weight:600; padding:0 4px}
+
+  /* prueba histórica */
+  #history .kpi{border-style:dashed}
+  .calib{display:flex; flex-direction:column; gap:10px; margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:14px 16px}
+  .calib .q{font-size:13.5px; color:var(--ink-2); margin:0}
+  .calib-row{display:grid; grid-template-columns:72px minmax(0,1fr) auto; gap:12px; align-items:center; font-size:13px; color:var(--ink-2)}
+  .calib-track{position:relative; height:10px; background:var(--surface-2); border-radius:5px}
+  .calib-fill{position:absolute; left:0; top:0; bottom:0; border-radius:5px; background:var(--accent)}
+  .calib-tick{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--ink)}
+  .calib-row b{font-family:var(--f-data); color:var(--ink); font-weight:600}
+  @media (max-width:600px){ .calib-row{grid-template-columns:64px minmax(0,1fr)} .calib-row > span:last-child{grid-column:1 / -1; margin-top:-4px} }
+  details.lg{margin-top:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:12px 16px}
+  details.lg summary{cursor:pointer; font-weight:700; font-size:14px}
+  .tbl{overflow-x:auto}
+  .lg-table{width:100%; border-collapse:collapse; margin-top:10px; font-size:13px}
+  .lg-table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); font-weight:600; padding:5px 6px; border-bottom:1px solid var(--line)}
+  .lg-table td{padding:6px; border-bottom:1px solid var(--line)}
+  .lg-table .n{font-family:var(--f-data); text-align:right; font-variant-numeric:tabular-nums}
+  .lg-table th.n{font-family:var(--f-body)}
+
+  .state-box{background:var(--surface); border:1px dashed var(--line); border-radius:var(--r); padding:20px 16px; text-align:center; color:var(--ink-2); font-size:14px}
+  .state-box a{color:var(--accent); font-weight:600}
+  .skel{background:linear-gradient(90deg,var(--surface-2) 25%,var(--line) 37%,var(--surface-2) 63%); background-size:400% 100%; animation:sk 1.4s ease infinite; border-radius:var(--r)}
+  .band .skel{background:var(--band-2); animation:none}
+  @keyframes sk{0%{background-position:100% 0}100%{background-position:0 0}}
+  @media (prefers-reduced-motion:reduce){ .skel{animation:none} }
+  footer{border-top:1px solid var(--line); padding-block:16px 8px; font-size:12px; color:var(--ink-3); display:flex; flex-direction:column; gap:6px}
+  .quota{font-family:var(--f-data)}
+  .quota.low{color:var(--loss); font-weight:600}
+  .mark.logo{background:none; width:40px; height:40px; border-radius:10px; overflow:hidden}
+  .mark.logo svg{width:40px; height:40px}
+</style>
+<style>
+  /* pagina publica: secciones extra */
+  .pro-card{background:var(--surface); border:1px solid var(--gold); border-radius:18px; padding:20px 22px; display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:20px; align-items:center}
+  @media (max-width:760px){ .pro-card{grid-template-columns:minmax(0,1fr)} }
+  .pro-card h2{font-size:28px; text-transform:uppercase; letter-spacing:.02em; display:flex; align-items:center; gap:10px}
+  .pro-card ul{margin:10px 0 0; padding-left:18px; color:var(--ink-2); font-size:14px; display:flex; flex-direction:column; gap:6px}
+  .pro-stats{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+  .pro-stats .kpi .v{font-size:26px}
+  .cta{display:inline-flex; align-items:center; gap:8px; margin-top:14px; padding:10px 18px; border-radius:999px; background:var(--ink); color:var(--bg); font-weight:700; font-size:14px; text-decoration:none}
+  .cta:hover{opacity:.9}
+  .lock{font-size:12.5px; color:var(--ink-3); margin-top:8px}
+  .band.mine{border:2px solid var(--gold)}
+  .fp-odds{font-size:12.5px; color:var(--band-muted)} .fp-odds b{color:var(--band-ink); font-family:var(--f-data)}
+  .fp.void{opacity:.5}
+  .mine-rec{font-size:13px; color:var(--band-muted); position:relative; z-index:1}
+  .mine-rec b{color:var(--band-ink)}
+  [hidden]{display:none !important}
+</style>
 </head>
 <body>
-
-<!-- ========================================= -->
-<!-- HEADER -->
-<!-- ========================================= -->
-<header class="header" id="header">
-  <div class="header__inner container">
-    <a href="#inicio" class="header__logo">
-      <span class="header__logo-mark" aria-hidden="true">
-        <svg viewBox="0 0 60 60" width="40" height="40">
-          <circle cx="30" cy="30" r="28" fill="var(--vino)"/>
-          <ellipse cx="21" cy="27" rx="5" ry="6.5" fill="#F6C7B0"/>
-          <ellipse cx="39" cy="27" rx="5" ry="6.5" fill="#F6C7B0"/>
-          <ellipse cx="30" cy="33" rx="17" ry="14" fill="#F9D5C2"/>
-          <path d="M18 30 Q30 22 42 30" stroke="#2B1710" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-          <path d="M16 33 Q30 45 44 33" stroke="#2B1710" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <ellipse cx="30" cy="38" rx="7" ry="5" fill="#EAA485"/>
-          <circle cx="27.3" cy="38" r="1.1" fill="#7A3B22"/>
-          <circle cx="32.7" cy="38" r="1.1" fill="#7A3B22"/>
-          <path d="M20 28 Q22.5 25.5 25 28" stroke="#2B1710" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-          <circle cx="37" cy="27.5" r="1.7" fill="#2B1710"/>
-        </svg>
-      </span>
-      <span class="header__logo-text">El Crujiente <em>Light</em></span>
-    </a>
-
-    <nav class="header__nav" id="primaryNav">
-      <a href="#inicio">Inicio</a>
-      <a href="#menu">Menú</a>
-      <a href="#nosotros">Nosotros</a>
-      <a href="#eventos">Eventos</a>
-      <a href="#galeria">Galería</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-
-    <a href="#" class="btn btn--primary btn--small js-whatsapp-link header__cta">Pedir ahora</a>
-
-    <button class="header__burger" id="burgerBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileNav">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-
-  <div class="mobile-nav" id="mobileNav">
-    <a href="#inicio">Inicio</a>
-    <a href="#menu">Menú</a>
-    <a href="#nosotros">Nosotros</a>
-    <a href="#eventos">Eventos</a>
-    <a href="#galeria">Galería</a>
-    <a href="#contacto">Contacto</a>
-    <a href="#" class="btn btn--primary js-whatsapp-link">Pedir por WhatsApp</a>
+<header class="top">
+  <div class="wrap">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="mark logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40"> <defs> <linearGradient id="kbg" x1="0" y1="0" x2="1" y2="1"> <stop offset="0" stop-color="#14305C"/> <stop offset="1" stop-color="#0A1830"/> </linearGradient> </defs> <rect width="512" height="512" rx="112" fill="url(#kbg)"/> <g transform="translate(24 4)"> <g stroke="#E3B85A" stroke-width="18" stroke-linecap="round"> <line x1="92" y1="214" x2="140" y2="214"/> <line x1="72" y1="256" x2="140" y2="256"/> <line x1="92" y1="298" x2="140" y2="298"/> </g> <rect x="168" y="132" width="56" height="248" rx="14" fill="#F2F5FA"/> <path d="M224 262 L340 380" stroke="#F2F5FA" stroke-width="56" stroke-linecap="round"/> <path d="M224 262 L318 168" stroke="#3CCB8F" stroke-width="56" stroke-linecap="round"/> <path d="M276 118 L392 118 L392 234 Z" fill="#3CCB8F" stroke="#3CCB8F" stroke-width="10" stroke-linejoin="round"/> </g> </svg></div>
+        <div>
+          <h1>Kinetik Picks</h1>
+          <div class="tag">Pronósticos con probabilidades reales</div>
+        </div>
+      </div>
+      <div class="live"><i></i><span id="liveTxt">Actualización automática</span></div>
+    </div>
   </div>
 </header>
 
-<main>
-
-<!-- ========================================= -->
-<!-- HERO -->
-<!-- ========================================= -->
-<section class="hero" id="inicio">
-  <div class="hero__media">
-    <div class="hero__img">
-      <img class="real-photo" src="images/lechona-entera-bandeja.jpg" alt="Lechona colombiana entera recién horneada, dorada y crujiente — El Crujiente Light">
-    </div>
-    <div class="hero__scrim"></div>
-  </div>
-
-  <div class="hero__content container">
-    <p class="hero__eyebrow">El Crujiente Light</p>
-    <div class="gold-ribbon" aria-hidden="true"></div>
-    <h1 class="hero__title">Tradición<br>que cruje.</h1>
-    <p class="hero__lead">El sabor de una buena lechona se reconoce desde el primer crujido.</p>
-    <div class="hero__actions">
-      <a href="#" class="btn btn--primary js-whatsapp-link">Pedir por WhatsApp</a>
-      <a href="#menu" class="btn btn--ghost">Ver menú</a>
-    </div>
-  </div>
-
-  <svg class="crunch-edge crunch-edge--hero" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,60 L0,22 L40,38 L82,10 L126,34 L168,4 L214,30 L256,12 L300,36 L344,8 L388,32 L430,14 L474,40 L518,6 L560,28 L604,16 L648,38 L690,10 L734,32 L778,4 L820,30 L864,18 L908,40 L950,12 L994,34 L1038,8 L1080,30 L1122,16 L1160,36 L1200,20 L1200,60 Z"/>
-  </svg>
-</section>
-
-<!-- ========================================= -->
-<!-- SECCIÓN DE MARCA -->
-<!-- ========================================= -->
-<section class="brand" id="nosotros">
-  <div class="container brand__grid">
-    <div class="brand__text">
-      <h2>No es solo lechona.</h2>
-      <p>Es la receta que se ha pasado de generación en generación en las cocinas colombianas, cocinada a fuego lento hasta que la piel queda dorada y crujiente por fuera, y jugosa por dentro. Es la mesa llena, la familia reunida, el plato que nunca falta en una celebración que vale la pena recordar.</p>
-      <p>En El Crujiente Light cuidamos cada paso de la preparación —del adobo al horno— para que cada porción llegue con el mismo respeto por la tradición con el que se prepara en casa, pensada también para quien busca disfrutarla con cuidado.</p>
-    </div>
-    <div class="brand__media placeholder-img" data-placeholder-label="Foto del proceso de preparación o del equipo de El Crujiente Light"></div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- NUESTRO SELLO -->
-<!-- ========================================= -->
-<section class="sello">
-  <div class="container">
-    <h2 class="sello__title">Nuestro sello</h2>
-    <div class="sello__grid">
-      <article class="sello__card sello__card--big">
-        <svg class="sello__icon" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M6 30 Q12 18 18 30 Q24 16 30 30 Q36 18 42 30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
-        <h3>Crujiente</h3>
-        <p>Piel dorada y tostada al punto exacto, el detalle que distingue una buena lechona.</p>
-      </article>
-      <article class="sello__card">
-        <svg class="sello__icon" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" stroke-width="3"/><path d="M24 14v10l7 5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
-        <h3>Sabor</h3>
-        <p>Adobo casero y cocción lenta para un sabor profundo, nada apresurado.</p>
-      </article>
-      <article class="sello__card">
-        <svg class="sello__icon" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M24 6 L30 18 L44 20 L34 30 L37 44 L24 37 L11 44 L14 30 L4 20 L18 18 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>
-        <h3>Tradición</h3>
-        <p>Receta colombiana heredada, preparada como se ha hecho siempre.</p>
-      </article>
-      <article class="sello__card">
-        <svg class="sello__icon" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M8 24 L20 36 L40 12" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h3>Calidad</h3>
-        <p>Ingredientes seleccionados y un proceso cuidado de principio a fin.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- PRODUCTO DESTACADO -->
-<!-- ========================================= -->
-<section class="featured">
-  <div class="container featured__grid">
-    <div class="featured__media">
-      <img class="real-photo" src="images/lechona-corte-crujiente.jpg" alt="Corte de lechona El Crujiente Light mostrando la piel crujiente y el relleno jugoso">
-    </div>
-    <div class="featured__content">
-      <p class="featured__eyebrow">La protagonista</p>
-      <h2>Lechona El Crujiente Light</h2>
-      <p>Cerdo relleno de arroz, arveja y especias, horneado por horas hasta lograr una piel crujiente inconfundible. Se sirve con arroz, insulso y las guarniciones de siempre.</p>
-      <p class="featured__price">[PRECIO]</p>
-      <a href="#" class="btn btn--primary js-whatsapp-link">Pedir ahora</a>
-    </div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- MENÚ -->
-<!-- ========================================= -->
-<section class="menu-section" id="menu">
-  <div class="container">
-    <p class="section-kicker">Menú</p>
-    <h2 class="menu-section__title">Escoge tu porción</h2>
-
-    <div class="menu-tabs" id="menuTabs">
-      <button class="menu-tabs__btn is-active" data-target="lechona">Lechona</button>
-      <button class="menu-tabs__btn" data-target="porciones">Porciones</button>
-      <button class="menu-tabs__btn" data-target="combos">Combos</button>
-      <button class="menu-tabs__btn" data-target="eventos-menu">Eventos</button>
-    </div>
-
-    <div class="menu-panel is-active" id="lechona">
-      <div class="menu-grid">
-        <div class="menu-card">
-          <div class="menu-card__img">
-            <img class="real-photo" src="images/lechona-entera-bandeja.jpg" alt="Lechona entera — El Crujiente Light">
-          </div>
-          <div class="menu-card__body">
-            <h3>Lechona entera</h3>
-            <p>Ideal para eventos grandes y celebraciones familiares.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
-        <div class="menu-card">
-          <div class="menu-card__img">
-            <img class="real-photo" src="images/lechona-corte-crujiente.jpg" alt="Media lechona — El Crujiente Light">
-          </div>
-          <div class="menu-card__body">
-            <h3>Media lechona</h3>
-            <p>Perfecta para reuniones medianas.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
+<main class="wrap">
+  <section id="mine" class="band mine" aria-labelledby="mineTitle" hidden>
+    <div class="band-head">
+      <div>
+        <h2 id="mineTitle">Tu Selección del día <span class="pill pro">Pro</span></h2>
+        <p class="sub">Los 5 pronósticos con la probabilidad más alta de hoy, en cualquier mercado. Apuesta solo si la casa paga más que la cuota mínima. Esta sección solo la ves tú.</p>
       </div>
+      <div class="band-stats" id="mineStats"></div>
     </div>
+    <div id="mineBody"></div>
+    <div class="mine-rec" id="mineRecent"></div>
+  </section>
 
-    <div class="menu-panel" id="porciones">
-      <div class="menu-grid">
-        <div class="menu-card">
-          <div class="menu-card__img">
-            <img class="real-photo" src="images/porciones-empacadas-1.jpg" alt="Porción individual de lechona empacada — El Crujiente Light">
-          </div>
-          <div class="menu-card__body">
-            <h3>Porción individual</h3>
-            <p>Lechona, arroz e insulso en porción personal.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
-        <div class="menu-card">
-          <div class="menu-card__img">
-            <img class="real-photo" src="images/porciones-empacadas-2.jpg" alt="Porción familiar de lechona empacada — El Crujiente Light">
-          </div>
-          <div class="menu-card__body">
-            <h3>Porción familiar</h3>
-            <p>Pensada para compartir entre 4 personas.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
+  <section id="calc" aria-labelledby="calcTitle" hidden>
+    <div class="sec-head"><h2 id="calcTitle">Calculadora de combinadas <span class="pill pro">Pro</span></h2><span class="meta" id="calcMeta"></span></div>
+    <p class="lede">Arma tu combinada con los partidos de la parrilla y escribe la cuota total que te paga la casa. Te decimos la probabilidad real según nuestro modelo y si esa cuota la paga bien o mal.</p>
+    <div class="calc">
+      <div class="calc-row"><select id="cMatch" aria-label="Partido"></select><select id="cMarket" aria-label="Mercado"></select><button type="button" class="chip on" id="cAdd">Agregar</button></div>
+      <div id="cLegs" class="res-list"></div>
+      <div class="calc-row"><label for="cOdds">Cuota total de la casa</label><input id="cOdds" type="number" inputmode="decimal" step="0.01" min="1" placeholder="Ej. 7,88"></div>
+      <div id="cOut" class="calc-out"></div>
+    </div>
+  </section>
+  <section id="board" aria-labelledby="boardTitle" hidden>
+    <div class="sec-head"><h2 id="boardTitle">Parrilla completa <span class="pill pro">Pro</span></h2><span class="meta" id="boardMeta"></span></div>
+    <p class="lede">Todos los partidos con pronóstico: fútbol (próximos 3 días) con resultado, doble oportunidad, goles, ambos anotan, marcador, córners y tarjetas; tenis, NFL, MLB y baloncesto (próximos 7 días) con el ganador. Solo la ves tú.</p>
+    <div id="boardBody"></div>
+    <div class="sec-head" style="margin-top:26px"><h2>Resultados de la parrilla · 48 h</h2><span class="meta" id="recentMeta"></span></div>
+    <div id="recentBody"></div>
+  </section>
+  <section id="bpval" aria-labelledby="bpvalTitle" hidden>
+    <div class="sec-head"><h2 id="bpvalTitle">Valor en BetPlay <span class="pill pro">Pro</span></h2><span class="meta" id="bpvalMeta"></span></div>
+    <p class="lede">Cuotas de BetPlay más altas que el precio justo de Pinnacle (la casa más precisa del mundo, sin su margen). Es una ventaja estimada, no una garantía: cada señal queda registrada y se mide contra el resultado y contra la línea final de Pinnacle. Se actualiza una vez al día (12:40 p. m.).</p>
+    <div id="bpvalBody"></div>
+  </section>
+  <section id="free" class="band" aria-labelledby="freeTitle">
+    <div class="band-head">
+      <div>
+        <h2 id="freeTitle">Gratis de hoy <span class="pill free">Gratis</span></h2>
+        <p class="sub">Los 3 pronósticos de mayor probabilidad del día según nuestro modelo, en cualquier mercado y siempre con 75 % o más. Se publican cada mañana a las 6:05 a. m. (hora de Colombia) y no se cambian después.</p>
       </div>
+      <div class="band-stats" id="freeStats"></div>
     </div>
+    <div id="freeBody"><div class="skel" style="height:130px"></div></div>
+    <div class="band-foot">Aciertan mucho y pagan cuotas bajas. Son pronósticos, no garantía: también fallan, y aquí se ve cada fallo.</div>
+  </section>
 
-    <div class="menu-panel" id="combos">
-      <div class="menu-grid">
-        <div class="menu-card">
-          <div class="menu-card__img placeholder-img" data-placeholder-label="Foto: combo individual"></div>
-          <div class="menu-card__body">
-            <h3>Combo individual</h3>
-            <p>Porción de lechona + bebida.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
-        <div class="menu-card">
-          <div class="menu-card__img placeholder-img" data-placeholder-label="Foto: combo familiar"></div>
-          <div class="menu-card__body">
-            <h3>Combo familiar</h3>
-            <p>Porción familiar + acompañantes + bebidas.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Pedir</a>
-            </div>
-          </div>
-        </div>
+  <section id="freeHistory" aria-labelledby="fhTitle">
+    <div class="sec-head"><h2 id="fhTitle">Historial de los gratis</h2><span class="meta" id="fhMeta"></span></div>
+    <p class="lede">Cada pronóstico gratis publicado y cómo terminó. Nada se borra.</p>
+    <div id="fhBody"><div class="skel" style="height:140px"></div></div>
+  </section>
+
+  <section id="pro" aria-labelledby="proTitle">
+    <div class="pro-card">
+      <div>
+        <h2 id="proTitle">Kinetik Pro <span class="pill pro">Pro</span></h2>
+        <ul>
+          <li><b>Selección del día:</b> hasta 5 partidos con la probabilidad más alta, en los mercados más confiables, con su cuota mínima.</li>
+          <li><b>Parrilla completa:</b> <span id="proUpcoming">todos los partidos</span> de más de 30 ligas, con resultado, goles (1,5 · 2,5 · 3,5), ambos anotan, marcadores probables, córners y tarjetas.</li>
+          <li><b>Alertas por Telegram</b> en la mañana y apenas terminan los partidos.</li>
+        </ul>
+        <a class="cta" href="https://t.me/Kinetikpicks_alertas_bot" target="_blank" rel="noopener">Quiero Pro · avísenme</a>
+        <div class="lock">Próximamente. El contenido Pro no se publica aquí.</div>
       </div>
+      <div class="pro-stats" id="proStats"></div>
     </div>
+  </section>
 
-    <div class="menu-panel" id="eventos-menu">
-      <div class="menu-grid">
-        <div class="menu-card">
-          <div class="menu-card__img placeholder-img" data-placeholder-label="Foto: montaje para eventos"></div>
-          <div class="menu-card__body">
-            <h3>Paquete para eventos</h3>
-            <p>Lechona por cantidad de personas, con montaje incluido.</p>
-            <div class="menu-card__footer">
-              <span class="menu-card__price">[PRECIO]</span>
-              <a href="#" class="btn btn--small btn--primary js-whatsapp-link">Cotizar</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  <section id="accuracy" aria-labelledby="accTitle">
+    <div class="sec-head"><h2 id="accTitle">Récord en vivo</h2><span class="meta" id="accMeta"></span></div>
+    <p class="lede">Todos los pronósticos del sistema se guardan 3 horas antes del partido y se califican solos al terminar. Al azar, el resultado de un partido de fútbol se acierta 33 % de las veces.</p>
+    <div id="accBody"><div class="skel" style="height:110px"></div></div>
+  </section>
 
-<!-- ========================================= -->
-<!-- SECCIÓN DE ANTOJO -->
-<!-- ========================================= -->
-<section class="antojo">
-  <div class="antojo__media">
-    <img class="real-photo" src="images/lechona-corte-crujiente.jpg" alt="Primer plano de la piel crujiente de la lechona El Crujiente Light" style="object-position: 30% 70%;">
-  </div>
-  <div class="antojo__scrim"></div>
-  <div class="antojo__content container">
-    <h2>El crujiente que estabas buscando.</h2>
-    <a href="#" class="btn btn--primary js-whatsapp-link">Quiero probarla</a>
-  </div>
-  <svg class="crunch-edge crunch-edge--top" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,0 L0,38 L40,22 L82,50 L126,26 L168,56 L214,30 L256,48 L300,24 L344,52 L388,28 L430,46 L474,20 L518,54 L560,32 L604,44 L648,22 L690,50 L734,28 L778,56 L820,30 L864,42 L908,20 L950,48 L994,26 L1038,52 L1080,30 L1122,44 L1160,24 L1200,40 L1200,0 Z"/>
-  </svg>
-  <svg class="crunch-edge crunch-edge--bottom" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,60 L0,22 L40,38 L82,10 L126,34 L168,4 L214,30 L256,12 L300,36 L344,8 L388,32 L430,14 L474,40 L518,6 L560,28 L604,16 L648,38 L690,10 L734,32 L778,4 L820,30 L864,18 L908,40 L950,12 L994,34 L1038,8 L1080,30 L1122,16 L1160,36 L1200,20 L1200,60 Z"/>
-  </svg>
-</section>
+  <section id="history" aria-labelledby="histTitle">
+    <div class="sec-head"><h2 id="histTitle">Probado en temporadas anteriores <span class="pill hist">Prueba histórica</span></h2><span class="meta" id="simMeta"></span></div>
+    <p class="lede">Antes de publicar un solo pronóstico, pusimos a prueba el sistema con los partidos de las últimas temporadas. Cada partido se pronosticó usando solo la información disponible antes de jugarse y después se comparó con el resultado real. Fútbol, 28 ligas.</p>
+    <div id="simBody"><div class="skel" style="height:160px"></div></div>
+  </section>
 
-<!-- ========================================= -->
-<!-- EVENTOS -->
-<!-- ========================================= -->
-<section class="eventos" id="eventos">
-  <div class="container">
-    <p class="section-kicker">Eventos</p>
-    <h2>Tu evento merece algo que todos recuerden.</h2>
-    <div class="eventos__grid">
-      <div class="eventos__item">Cumpleaños</div>
-      <div class="eventos__item">Reuniones familiares</div>
-      <div class="eventos__item">Eventos empresariales</div>
-      <div class="eventos__item">Celebraciones</div>
-      <div class="eventos__item">Fiestas</div>
-      <div class="eventos__item">Fechas especiales</div>
-    </div>
-    <a href="#" class="btn btn--primary js-whatsapp-link">Cotizar mi evento</a>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- GALERÍA -->
-<!-- ========================================= -->
-<section class="galeria" id="galeria">
-  <div class="container">
-    <p class="section-kicker">Galería</p>
-    <h2>Así se ve —y se disfruta— El Crujiente Light</h2>
-    <div class="galeria__grid">
-      <div class="galeria__item"><img class="real-photo" src="images/lechona-entera-bandeja.jpg" alt="Lechona entera — El Crujiente Light"></div>
-      <div class="galeria__item"><img class="real-photo" src="images/porciones-empacadas-1.jpg" alt="Porciones de lechona empacadas — El Crujiente Light"></div>
-      <div class="galeria__item placeholder-img" data-placeholder-label="Preparación"></div>
-      <div class="galeria__item"><img class="real-photo" src="images/lechona-corte-crujiente.jpg" alt="Presentación del corte de lechona — El Crujiente Light"></div>
-      <div class="galeria__item placeholder-img" data-placeholder-label="Eventos"></div>
-      <div class="galeria__item placeholder-img" data-placeholder-label="Clientes"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- TESTIMONIOS -->
-<!-- ========================================= -->
-<section class="testimonios">
-  <div class="container">
-    <h2>Lo que dicen nuestros clientes</h2>
-    <div class="testimonios__grid">
-      <blockquote class="testimonio">
-        <p>[TESTIMONIO REAL]</p>
-        <cite>— [NOMBRE DEL CLIENTE]</cite>
-      </blockquote>
-      <blockquote class="testimonio">
-        <p>[TESTIMONIO REAL]</p>
-        <cite>— [NOMBRE DEL CLIENTE]</cite>
-      </blockquote>
-      <blockquote class="testimonio">
-        <p>[TESTIMONIO REAL]</p>
-        <cite>— [NOMBRE DEL CLIENTE]</cite>
-      </blockquote>
-    </div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- REDES SOCIALES -->
-<!-- ========================================= -->
-<section class="redes">
-  <div class="container redes__inner">
-    <h2>El antojo también vive en redes.</h2>
-    <div class="redes__links">
-      <a href="#" class="redes__link js-instagram-link" target="_blank" rel="noopener">Instagram — <span class="js-instagram-handle">@elcrujientelight</span></a>
-      <a href="#" class="redes__link js-tiktok-link" target="_blank" rel="noopener">TikTok — <span class="js-tiktok-handle">@elcrujientelight</span></a>
-    </div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- CONTACTO -->
-<!-- ========================================= -->
-<section class="contacto" id="contacto">
-  <div class="container contacto__grid">
-    <div>
-      <p class="section-kicker">Contacto</p>
-      <h2>Hablemos de tu pedido</h2>
-      <ul class="contacto__list">
-        <li><strong>WhatsApp:</strong> <a href="#" class="js-whatsapp-link"><span class="js-whatsapp-display">[WHATSAPP]</span></a> · <a href="#" class="js-whatsapp-link-2">[WHATSAPP 2]</a></li>
-        <li><strong>Dirección:</strong> [DIRECCIÓN]</li>
-        <li><strong>Ciudad:</strong> [CIUDAD]</li>
-        <li><strong>Horario:</strong> [HORARIO]</li>
-      </ul>
-      <a href="#" class="btn btn--primary js-whatsapp-link">Escribir por WhatsApp</a>
-    </div>
-    <div class="contacto__media placeholder-img" data-placeholder-label="Mapa o foto del local"></div>
-  </div>
-</section>
-
-<!-- ========================================= -->
-<!-- CTA FINAL -->
-<!-- ========================================= -->
-<section class="cta-final">
-  <div class="container">
-    <div class="gold-ribbon gold-ribbon--center" aria-hidden="true"></div>
-    <h2>¿Ya se te antojó?</h2>
-    <p>El sabor que te provoca está a un mensaje de distancia.</p>
-    <a href="#" class="btn btn--primary btn--large js-whatsapp-link">Pedir ahora</a>
-  </div>
-</section>
-
+  <footer>
+    <div>Pronósticos generados por un modelo estadístico propio combinado con la probabilidad del mercado. Son información, no asesoría de apuestas ni garantía de resultados. Solo para mayores de 18 años. Si apuestas, hazlo con moderación y solo en casas autorizadas.</div>
+  </footer>
 </main>
 
-<!-- ========================================= -->
-<!-- FOOTER -->
-<!-- ========================================= -->
-<footer class="footer">
-  <div class="container footer__inner">
-    <div class="footer__brand">
-      <span class="header__logo-text footer__logo-text">El Crujiente <em>Light</em></span>
-      <p>Tradición que cruje.</p>
-    </div>
-    <div class="footer__links">
-      <a href="#" class="js-instagram-link" target="_blank" rel="noopener">Instagram</a>
-      <a href="#" class="js-tiktok-link" target="_blank" rel="noopener">TikTok</a>
-      <a href="#" class="js-whatsapp-link">WhatsApp</a>
-    </div>
-    <p class="footer__copy">© <span id="year"></span> El Crujiente Light. Todos los derechos reservados.</p>
-  </div>
-</footer>
+<script>
+(function(){
+  "use strict";
+  var API = "https://vritcqtzvvjwxmbmzsgy.supabase.co/rest/v1/rpc/public_free_dashboard";
+  // Llave publica (anon/publishable): solo puede ejecutar public_free_dashboard,
+  // que entrega el contenido gratis. Las tablas y lo Pro estan cerrados para ella.
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyaXRjcXR6dnZqd3htYm16c2d5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMjQ0ODQsImV4cCI6MjEwNTcwMDQ4NH0.0-OzeurD3-_6gWurBlYAPxrnnPzDr7eZ_rUYDklVnk8";
+  // Nombres de liga como los conoce el público
+  var LEAGUE_NAMES = {
+    "EPL":"Premier League · Inglaterra", "La Liga - Spain":"La Liga · España", "Serie A - Italy":"Serie A · Italia",
+    "Bundesliga - Germany":"Bundesliga · Alemania", "Ligue 1 - France":"Ligue 1 · Francia",
+    "Championship - England":"Championship · Inglaterra", "League One - England":"League One · Inglaterra",
+    "Premiership - Scotland":"Premiership · Escocia", "2. Bundesliga - Germany":"2. Bundesliga · Alemania",
+    "Serie B - Italy":"Serie B · Italia", "La Liga 2 - Spain":"La Liga 2 · España", "Ligue 2 - France":"Ligue 2 · Francia",
+    "Eredivisie - Netherlands":"Eredivisie · Países Bajos", "Pro League - Belgium":"Pro League · Bélgica",
+    "Primeira Liga - Portugal":"Primeira Liga · Portugal", "Super Lig - Turkey":"Süper Lig · Turquía",
+    "Super League - Greece":"Superliga · Grecia", "Bundesliga - Austria":"Bundesliga · Austria",
+    "Superliga - Denmark":"Superliga · Dinamarca", "Eliteserien - Norway":"Eliteserien · Noruega",
+    "Allsvenskan - Sweden":"Allsvenskan · Suecia", "Super League - Switzerland":"Super League · Suiza",
+    "Ekstraklasa - Poland":"Ekstraklasa · Polonia", "J1 League - Japan":"J1 League · Japón",
+    "Liga BetPlay (Colombia Primera A)":"Liga BetPlay · Colombia", "Primera División - Uruguay":"Primera División · Uruguay",
+    "Liga 1 - Peru":"Liga 1 · Perú", "Primera División - Chile":"Primera División · Chile", "LigaPro - Ecuador":"LigaPro · Ecuador",
+    "Primera División - Paraguay":"Primera División · Paraguay", "Primera División - Argentina":"Liga Profesional · Argentina",
+    "Brazil Série A":"Brasileirão · Brasil", "Liga MX":"Liga MX · México", "MLS":"MLS · Estados Unidos",
+    "UEFA Nations League":"Selecciones · Nations League y amistosos", "UEFA Champions League":"Champions League",
+    "UEFA Champions League Women":"Champions League femenina", "Copa Libertadores":"Copa Libertadores", "Copa Sudamericana":"Copa Sudamericana"
+  };
+  function lgName(l){ return LEAGUE_NAMES[l] || l; }
 
-<!-- WHATSAPP FLOTANTE -->
-<a href="#" class="wa-float js-whatsapp-link" aria-label="Escribir por WhatsApp">
-  <svg viewBox="0 0 32 32" width="28" height="28" fill="currentColor" aria-hidden="true">
-    <path d="M16 3C9 3 3.3 8.6 3.3 15.5c0 2.5.7 4.8 1.9 6.8L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.6 12.7-12.5S23 3 16 3zm0 22.7c-1.9 0-3.7-.5-5.3-1.5l-.4-.2-4.1 1.3 1.3-4-.3-.4a10.1 10.1 0 0 1-1.7-5.6C5.5 9.8 10.2 5.3 16 5.3S26.5 9.8 26.5 15.5 21.8 25.7 16 25.7zm5.8-7.7c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-2-1.8-2.3-.2-.3 0-.5.1-.6.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.7 5.9 5.1.8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.6-.4z"/>
-  </svg>
-</a>
+  function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function pct(v){ return Math.round(v * 100) + "%"; }
+  function dec(v){ return (+v).toFixed(1).replace(".", ","); }
+  function nf(v){ return (+v).toLocaleString("es-CO"); }
 
-<script src="script.js"></script>
+  function fmtTime(iso){ try { return new Date(iso).toLocaleTimeString("es-CO", { hour:"2-digit", minute:"2-digit" }); } catch(e){ return ""; } }
+  function fmtDay(iso){
+    var d = new Date(iso), t = new Date(); t.setHours(0,0,0,0);
+    var dd = new Date(d); dd.setHours(0,0,0,0);
+    var diff = Math.round((dd - t) / 86400000);
+    var base = d.toLocaleDateString("es-CO", { weekday:"long", day:"numeric", month:"long" });
+    base = base.charAt(0).toUpperCase() + base.slice(1);
+    return diff === 0 ? "Hoy · " + base : diff === 1 ? "Mañana · " + base : base;
+  }
+  function shortDate(iso){ try { return new Date(iso).toLocaleDateString("es-CO", { day:"2-digit", month:"short" }); } catch(e){ return ""; } }
+
+  function dcText(pick, home, away){ return pick === "1X" ? home + " o empate" : away + " o empate"; }
+  /* ---------- gratis de hoy ---------- */
+  function renderFree(picks, rec, hist){
+    var body = document.getElementById("freeBody"), stats = document.getElementById("freeStats");
+    body.innerHTML = ""; stats.innerHTML = "";
+    function bstat(v, l){ var s = el("div","bstat"); s.appendChild(el("div","v", v)); s.appendChild(el("div","l", l)); stats.appendChild(s); }
+    if (rec && +rec.n) bstat(rec.h + "/" + rec.n, "acertados en vivo desde el lanzamiento");
+    else bstat("—", "récord en vivo: empieza con la primera lista");
+    if (!picks || !picks.length) {
+      var h = +new Date().toLocaleString("en-US", { timeZone:"America/Bogota", hour:"numeric", hour12:false });
+      body.appendChild(el("div","band-empty", h < 6
+        ? "La lista gratis de hoy se publica a las 6:05 a. m. (hora de Colombia)."
+        : "Hoy ningún partido llega al 75 %. Preferimos no publicar a publicar algo menos seguro. La próxima lista sale mañana a las 6:05 a. m."));
+      return;
+    }
+    var g = el("div","free-grid");
+    picks.forEach(function(p){
+      var c = el("article","fp");
+      var top = el("div","fp-top");
+      top.appendChild(el("span","lg", esc(lgName(p.league))));
+      top.appendChild(el("span","num", fmtTime(p.commence_time)));
+      c.appendChild(top);
+      c.appendChild(el("div","fp-teams", esc(p.home_team) + '<span class="vs">vs</span>' + esc(p.away_team)));
+      var pk = el("div","fp-pick");
+      pk.appendChild(el("span","what", esc(p.label || dcText(p.dc_pick, p.home_team, p.away_team))));
+      pk.appendChild(el("span","p", pct(+p.dc_prob)));
+      c.appendChild(pk);
+      var state = p.hit === true ? ["ok","✓ Acertado · " + p.home_score + "-" + p.away_score]
+        : p.hit === false ? ["no","✗ Fallado · " + p.home_score + "-" + p.away_score] : ["","Por jugarse"];
+      c.appendChild(el("span","fp-state " + state[0], esc(state[1])));
+      g.appendChild(c);
+    });
+    body.appendChild(g);
+  }
+
+  /* ---------- récord en vivo ---------- */
+  function kpiTile(l, value, sub, frac, ref){
+    var t = el("div","kpi");
+    t.appendChild(el("div","l", esc(l)));
+    t.appendChild(el("div","v", value));
+    t.appendChild(el("div","s", sub));
+    if (frac != null) {
+      var m = el("div","meter"), s = el("span"); s.style.width = (frac * 100) + "%"; m.appendChild(s);
+      if (ref != null) { var e = el("em"); e.style.left = "calc(" + (ref * 100) + "% - 1px)"; e.title = "Azar"; m.appendChild(e); }
+      t.appendChild(m);
+    }
+    return t;
+  }
+  /* ---------- prueba histórica ---------- */
+  function renderHistory(sum, leagues, dc){
+    var body = document.getElementById("simBody"), meta = document.getElementById("simMeta");
+    body.innerHTML = "";
+    var tot = (sum || []).filter(function(r){ return r.confidence == null; })[0];
+    if (!tot || !+tot.n) { body.appendChild(el("div","state-box","La prueba con temporadas anteriores todavía no tiene datos.")); return; }
+    var dd = function(x){ return shortDate(String(x).slice(0,10) + "T12:00:00") + " " + String(x).slice(0,4); };
+    meta.textContent = nf(tot.n) + " partidos puestos a prueba · " + dd(tot.desde) + " a " + dd(tot.hasta);
+    var k = el("div","kpis");
+    k.appendChild(kpiTile("Resultado (1X2)", pct(+tot.hit_result), "al azar: 33 %", +tot.hit_result, 1/3));
+    if (dc && +dc.n) k.appendChild(kpiTile("Categoría gratis 85 %+", pct(+dc.hit), nf(dc.n) + " pronósticos · doble oport. y +1,5 goles", +dc.hit, null));
+    k.appendChild(kpiTile("Más/menos 2,5 goles", pct(+tot.hit_over), "al azar: 50 %", +tot.hit_over, .5));
+    k.appendChild(kpiTile("Ambos anotan", pct(+tot.hit_btts), "al azar: 50 %", +tot.hit_btts, .5));
+    body.appendChild(k);
+    var extra = el("div","conf-row");
+    if (tot.hit_o15 != null) extra.appendChild(el("div","conf-item", "Goles más/menos 1,5 <b>" + pct(+tot.hit_o15) + "</b>"));
+    if (tot.hit_o35 != null) extra.appendChild(el("div","conf-item", "Goles más/menos 3,5 <b>" + pct(+tot.hit_o35) + "</b>"));
+    extra.appendChild(el("div","conf-item", "Marcador exacto <b>" + pct(+tot.hit_score) + "</b>"));
+    if (+tot.n_cards) extra.appendChild(el("div","conf-item", "Tarjetas más/menos 4,5 <b>" + pct(+tot.hit_cards) + "</b> (" + nf(tot.n_cards) + ")"));
+    if (+tot.n_corners) extra.appendChild(el("div","conf-item", "Córners más/menos 9,5 <b>" + pct(+tot.hit_corners) + "</b> (" + nf(tot.n_corners) + ")"));
+    body.appendChild(extra);
+
+    var cal = el("div","calib");
+    cal.appendChild(el("p","q", "¿Las probabilidades son confiables? La raya es la probabilidad que dio el pronosticador; la barra, lo que realmente pasó."));
+    [["alta","Alta"],["media","Media"],["baja","Baja"]].forEach(function(c){
+      var r = (sum || []).filter(function(x){ return x.confidence === c[0]; })[0];
+      if (!r) return;
+      var row = el("div","calib-row");
+      row.appendChild(el("span", null, '<span class="conf ' + c[0] + '">' + c[1] + '</span>'));
+      var tr = el("div","calib-track");
+      var fill = el("div","calib-fill"); fill.style.width = (+r.hit_result * 100) + "%"; tr.appendChild(fill);
+      var tick = el("div","calib-tick"); tick.style.left = "calc(" + (+r.prob_media * 100) + "% - 1px)"; tr.appendChild(tick);
+      row.appendChild(tr);
+      row.appendChild(el("span", null, "dijo <b>" + pct(+r.prob_media) + "</b> · acertó <b>" + pct(+r.hit_result) + "</b> <span style=\"color:var(--ink-3)\">(" + nf(r.n) + ")</span>"));
+      cal.appendChild(row);
+    });
+    body.appendChild(cal);
+
+    if (leagues && leagues.length) {
+      var d = el("details","lg");
+      d.appendChild(el("summary", null, "Aciertos por liga (" + leagues.length + ")"));
+      var wrap = el("div","tbl");
+      var t = el("table","lg-table");
+      t.innerHTML = '<thead><tr><th>Liga</th><th class="n">Partidos</th><th class="n">1X2</th><th class="n">Confianza alta</th><th class="n">+/- 2,5</th></tr></thead>';
+      var tb = el("tbody");
+      leagues.forEach(function(l){
+        var tr = el("tr");
+        tr.innerHTML = "<td>" + esc(lgName(l.league)) + "</td><td class=\"n\">" + nf(l.n) + "</td><td class=\"n\">" + pct(+l.hit_result) + "</td><td class=\"n\">" + (+l.n_alta ? pct(+l.hit_alta) + " (" + l.n_alta + ")" : "—") + "</td><td class=\"n\">" + pct(+l.hit_over) + "</td>";
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); d.appendChild(wrap); body.appendChild(d);
+    }
+  }
+
+  function errBox(){ return el("div","state-box","No se pudieron cargar los datos. Revisa tu conexión y recarga la página en un momento."); }
+
+  function renderFreeHistory(list){
+    var body = document.getElementById("fhBody"), meta = document.getElementById("fhMeta");
+    body.innerHTML = "";
+    if (!list || !list.length) { body.appendChild(el("div","state-box","El historial empieza con la primera lista gratis calificada.")); meta.textContent = ""; return; }
+    var ok = list.filter(function(r){ return r.hit; }).length;
+    meta.textContent = "últimos " + list.length + " · " + ok + " acertados";
+    var box = el("div","res-list");
+    list.forEach(function(r){
+      var it = el("div","res");
+      it.appendChild(el("div", r.hit ? "mark-ok" : "mark-no", r.hit ? "✓" : "✗"));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", esc(r.home_team) + ' <span class="sc">' + r.home_score + "-" + r.away_score + "</span> " + esc(r.away_team)));
+      mid.appendChild(el("div","d", esc(r.label || dcText(r.dc_pick, r.home_team, r.away_team)) + " " + pct(+r.dc_prob) + " · " + esc(lgName(r.league)) + " · " + shortDate(r.commence_time)));
+      it.appendChild(mid);
+      box.appendChild(it);
+    });
+    body.appendChild(box);
+  }
+
+  function renderPro(pr){
+    var box = document.getElementById("proStats"); box.innerHTML = "";
+    if (!pr) return;
+    if (+pr.upcoming) document.getElementById("proUpcoming").textContent = nf(pr.upcoming) + " partidos de los próximos 14 días";
+    var sel = pr.selection || {}, lv = pr.live || {};
+    box.appendChild(kpiTile("Selección del día", +sel.n ? pct(sel.h / sel.n) : "—", +sel.n ? sel.h + " de " + sel.n + " en vivo" : "récord en vivo desde hoy", +sel.n ? sel.h / sel.n : null, null));
+    box.appendChild(kpiTile("Confianza alta (1X2)", +lv.n_alta ? pct(lv.h_alta / lv.n_alta) : "—", +lv.n_alta ? lv.h_alta + " de " + lv.n_alta + " en vivo" : "sin datos todavía", +lv.n_alta ? lv.h_alta / lv.n_alta : null, 1/3));
+  }
+
+  function renderLive(lv){
+    var body = document.getElementById("accBody"), meta = document.getElementById("accMeta");
+    body.innerHTML = "";
+    var n = +(lv && lv.n) || 0;
+    meta.textContent = n ? nf(n) + " pronósticos calificados" : "";
+    if (!n) { body.appendChild(el("div","state-box","Todavía no hay partidos calificados.")); return; }
+    var k = el("div","kpis");
+    function t(l, hits, total, ref){ return kpiTile(l, total ? pct(hits/total) : "—", total ? hits + " de " + total : "sin datos todavía", total ? hits/total : null, ref); }
+    k.appendChild(t("Resultado (1X2)", +lv.hit_result, n, 1/3));
+    k.appendChild(t("Doble oportunidad", +lv.hit_dc, +lv.n_dc, 2/3));
+    k.appendChild(t("Más/menos 1,5 goles", +lv.hit_o15, +lv.n_o15, .5));
+    k.appendChild(t("Confianza alta", +lv.h_alta, +lv.n_alta, 1/3));
+    body.appendChild(k);
+    var row = el("div","conf-row");
+    [["alta","Confianza alta"],["media","Confianza media"],["baja","Confianza baja"]].forEach(function(c){
+      var tot = +lv["n_" + c[0]], h = +lv["h_" + c[0]];
+      row.appendChild(el("div","conf-item", '<span class="conf ' + c[0] + '">' + c[1] + '</span> ' + (tot ? '<b>' + pct(h/tot) + '</b> (' + h + ' de ' + tot + ')' : 'sin datos')));
+    });
+    body.appendChild(row);
+  }
+
+  /* ---------- seleccion privada (solo con llave) ---------- */
+  var KEY = null;
+  try {
+    var qk = new URLSearchParams(location.search).get("k");
+    if (qk) { try { localStorage.setItem("kp_key", qk); } catch(e) {} history.replaceState(null, "", location.pathname); }
+    KEY = qk; if (!KEY) { try { KEY = localStorage.getItem("kp_key"); } catch(e) {} }
+  } catch(e) {}
+  function renderMine(d){
+    var sec = document.getElementById("mine");
+    if (!d) { sec.hidden = true; return; }
+    sec.hidden = false;
+    var body = document.getElementById("mineBody"), stats = document.getElementById("mineStats"), rc = document.getElementById("mineRecent");
+    body.innerHTML = ""; stats.innerHTML = ""; rc.innerHTML = "";
+    var rec = d.rec || {};
+    var s = el("div","bstat"); s.appendChild(el("div","v", +rec.n ? rec.h + "/" + rec.n : "—")); s.appendChild(el("div","l", +rec.n ? "acertados en vivo (" + pct(rec.h/rec.n) + ")" : "récord en vivo: empieza hoy")); stats.appendChild(s);
+    var picks = d.picks || [];
+    if (!picks.length) { body.appendChild(el("div","band-empty","Hoy no hay Selección todavía. Se publica a las 6:00 a. m. (hora de Colombia).")); }
+    else {
+      var g = el("div","free-grid");
+      picks.forEach(function(p){
+        var c = el("article","fp" + (p.void ? " void" : ""));
+        var top = el("div","fp-top");
+        top.appendChild(el("span","lg", "#" + p.rank + " · " + esc(lgName(p.league))));
+        top.appendChild(el("span","num", fmtTime(p.commence_time)));
+        c.appendChild(top);
+        c.appendChild(el("div","fp-teams", esc(p.home_team) + '<span class="vs">vs</span>' + esc(p.away_team)));
+        var pk = el("div","fp-pick");
+        pk.appendChild(el("span","what", esc(p.label)));
+        pk.appendChild(el("span","p", pct(+p.prob)));
+        c.appendChild(pk);
+        c.appendChild(el("div","fp-odds", "Cuota mínima <b>" + String(p.min_odds).replace(".", ",") + "</b>"));
+        var sc = p.home_score != null ? " · " + p.home_score + "-" + p.away_score : "";
+        var st = p.void ? ["","Anulado"] : p.hit === true ? ["ok","✓ Acertado" + sc] : p.hit === false ? ["no","✗ Fallado" + sc] : ["","Por jugarse"];
+        c.appendChild(el("span","fp-state " + st[0], esc(st[1])));
+        g.appendChild(c);
+      });
+      body.appendChild(g);
+    }
+    var rcnt = d.recent || [];
+    if (rcnt.length) {
+      var ok = rcnt.filter(function(r){ return r.hit; }).length;
+      rc.innerHTML = "Últimos 7 días: <b>" + ok + " de " + rcnt.length + "</b> acertados · " + rcnt.slice(0, 10).map(function(r){ return (r.hit ? "✓ " : "✗ ") + esc(r.label) + " (" + esc(r.home_team) + " " + r.home_score + "-" + r.away_score + ")"; }).join(" · ");
+    }
+  }
+  /* ---------- parrilla completa (solo con llave) ---------- */
+  function pickName(p, h, a){ return p === "Local" ? h : p === "Visitante" ? a : "Empate"; }
+  var SPORTS = { soccer:"Fútbol", tennis:"Tenis", football:"NFL", baseball:"MLB", basketball:"Baloncesto" };
+  var boardData = null, boardSport = "all";
+  function renderBoard(d){
+    var sec = document.getElementById("board");
+    if (!d) { sec.hidden = true; return; }
+    sec.hidden = false; boardData = d;
+    var body = document.getElementById("boardBody"); body.innerHTML = "";
+    var all = d.upcoming || [];
+    // filtro por deporte
+    var counts = {}; all.forEach(function(f){ counts[f.sport] = (counts[f.sport] || 0) + 1; });
+    var chips = el("div","chips");
+    [["all","Todos", all.length]].concat(Object.keys(SPORTS).filter(function(s){ return counts[s]; }).map(function(s){ return [s, SPORTS[s], counts[s]]; }))
+      .forEach(function(c){
+        var b = el("button", "chip" + (boardSport === c[0] ? " on" : ""), esc(c[1]) + " <b>" + c[2] + "</b>");
+        b.type = "button"; b.onclick = function(){ boardSport = c[0]; renderBoard(boardData); };
+        chips.appendChild(b);
+      });
+    body.appendChild(chips);
+    var rec = el("div","conf-row"); rec.style.margin = "0 0 14px";
+    (d.bysport || []).forEach(function(s){
+      if (!+s.n) return;
+      rec.appendChild(el("div","conf-item", esc(SPORTS[s.sport] || s.sport) + " <b>" + pct(s.h / s.n) + "</b> (" + s.h + "/" + s.n + ")" + (+s.n_alta ? " · alta <b>" + pct(s.h_alta / s.n_alta) + "</b>" : "")));
+    });
+    var va = d.vs_apif;
+    if (va && +va.n) rec.appendChild(el("div","conf-item", "Nosotros vs API-Football (ganador): <b>" + va.ours + "</b> vs <b>" + va.theirs + "</b> de " + va.n));
+    body.appendChild(rec);
+    var up = boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
+    document.getElementById("boardMeta").textContent = up.length + " partidos";
+    if (!up.length) body.appendChild(el("div","state-box","No hay partidos próximos para este deporte."));
+    var days = {}, order = [];
+    up.forEach(function(f){ var k = fmtDay(f.commence_time); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
+    order.forEach(function(k){
+      var day = el("div","day");
+      day.appendChild(el("div","day-title", esc(k) + ' <span class="n">' + days[k].length + (days[k].length === 1 ? ' partido' : ' partidos') + '</span>'));
+      var g = el("div","grid");
+      days[k].forEach(function(f){
+        var c = el("article","fc");
+        var top = el("div","fc-top");
+        top.appendChild(el("div","teams", esc(f.home_team) + '<span class="vs">vs</span>' + esc(f.away_team) + '<div class="src">' + esc((f.sport !== "soccer" ? (SPORTS[f.sport] || f.sport) + " · " : "") + lgName(f.league)) + '</div>'));
+        top.appendChild(el("span","when", fmtTime(f.commence_time)));
+        c.appendChild(top);
+        var v = el("div","verdict");
+        v.appendChild(el("span","pick", esc(pickName(f.pick, f.home_team, f.away_team))));
+        v.appendChild(el("span","pct", pct(+f.pick_prob)));
+        if (f.confidence) v.appendChild(el("span","conf " + f.confidence, esc(f.confidence)));
+        c.appendChild(v);
+        var bar = el("div","bar");
+        var hasDraw = f.p_draw != null;
+        (hasDraw ? [["h", f.p_home],["d", f.p_draw],["a", f.p_away]] : [["h", f.p_home],["a", f.p_away]]).forEach(function(x){ var s = el("span", x[0]); s.style.width = (+x[1] * 100) + "%"; bar.appendChild(s); });
+        c.appendChild(bar);
+        c.appendChild(el("div","bar-l", hasDraw
+          ? '<span><i class="dot h"></i>Local <b>' + pct(+f.p_home) + '</b></span><span><i class="dot d"></i>Empate <b>' + pct(+f.p_draw) + '</b></span><span><i class="dot a"></i>Visita <b>' + pct(+f.p_away) + '</b></span>'
+          : '<span><i class="dot h"></i>' + esc(f.home_team) + ' <b>' + pct(+f.p_home) + '</b></span><span><i class="dot a"></i>' + esc(f.away_team) + ' <b>' + pct(+f.p_away) + '</b></span>'));
+        var mk = el("div","mk"), parts = [];
+        if (f.dc_prob != null) parts.push('<span class="dc">' + esc((f.dc_pick === "1X" ? f.home_team : f.away_team) + " o empate") + ' <b>' + pct(+f.dc_prob) + '</b></span>');
+        if (f.over15 != null) parts.push('<span>+1,5 goles <b>' + pct(+f.over15) + '</b></span>');
+        if (f.over25 != null) parts.push('<span>+2,5 goles <b>' + pct(+f.over25) + '</b></span>');
+        if (f.over35 != null) parts.push('<span>-3,5 goles <b>' + pct(1 - f.over35) + '</b></span>');
+        if (f.btts != null) parts.push('<span>Ambos anotan <b>' + pct(+f.btts) + '</b></span>');
+        if (f.top_home != null) parts.push('<span>Marcador <b>' + f.top_home + '-' + f.top_away + '</b></span>');
+        if (f.corners_exp != null) parts.push('<span>Córners ~<b>' + dec(f.corners_exp) + '</b></span>');
+        if (f.cards_exp != null) parts.push('<span>Tarjetas ~<b>' + dec(f.cards_exp) + '</b></span>');
+        mk.innerHTML = parts.join("");
+        c.appendChild(mk);
+        if (f.apif) {
+          var ax = [], A = f.apif;
+          if (A.lineups && A.lineups.length) ax.push("Alineaciones confirmadas: <b>" + A.lineups.map(function(t){ return esc(t.formation || "?"); }).join(" vs ") + "</b>");
+          if (A.injuries) {
+            if (!A.injuries.length) ax.push("Bajas: <b>ninguna reportada</b>");
+            else {
+              var byT = {}; A.injuries.forEach(function(x){ (byT[x.team] = byT[x.team] || []).push(x.player); });
+              ax.push("Bajas: " + Object.keys(byT).map(function(t){ var l = byT[t]; return "<b>" + esc(t) + "</b> " + l.length + " (" + esc(l.slice(0,3).join(", ")) + (l.length > 3 ? "…" : "") + ")"; }).join(" · "));
+            }
+          }
+          if (A.pred) ax.push("API-Football: L " + pct(+A.pred[0]) + " · E " + pct(+A.pred[1]) + " · V " + pct(+A.pred[2]));
+          if (ax.length) c.appendChild(el("div","apif", ax.join("<br>")));
+        }
+        g.appendChild(c);
+      });
+      day.appendChild(g); body.appendChild(day);
+    });
+    renderCalc(all);
+    // resultados 48 h
+    var rb = document.getElementById("recentBody"); rb.innerHTML = "";
+    var rec = d.recent || [];
+    var n = rec.length, h1 = rec.filter(function(r){ return r.hit_result; }).length,
+        ndc = rec.filter(function(r){ return r.hit_dc != null; }).length, hdc = rec.filter(function(r){ return r.hit_dc; }).length;
+    document.getElementById("recentMeta").textContent = n ? ("Resultado " + h1 + "/" + n + " · Doble oport. " + hdc + "/" + ndc) : "";
+    if (!n) { rb.appendChild(el("div","state-box","Todavía no hay partidos calificados en las últimas 48 horas.")); return; }
+    // orden: primero los aciertos, luego los que fallaron el ganador pero acertaron otro mercado, al final el resto
+    var score = function(r){ return r.hit_result ? 2 : (r.hit_dc || r.hit_over15 || r.hit_over25 || r.hit_btts) ? 1 : 0; };
+    rec = rec.map(function(r, i){ return [r, i]; }).sort(function(a, b){ return score(b[0]) - score(a[0]) || a[1] - b[1]; }).map(function(x){ return x[0]; });
+    var box = el("div","res-list");
+    rec.forEach(function(r){
+      var it = el("div","res");
+      it.appendChild(el("div", r.hit_result ? "mark-ok" : "mark-no", r.hit_result ? "✓" : "✗"));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", esc(r.home_team) + ' <span class="sc">' + r.home_score + "-" + r.away_score + "</span> " + esc(r.away_team)));
+      var bits = ["Pick: " + esc(pickName(r.pick, r.home_team, r.away_team)) + " " + pct(+r.pick_prob)];
+      if (r.hit_dc != null) bits.push("DC " + (r.hit_dc ? "✓" : "✗"));
+      if (r.hit_over15 != null) bits.push("1,5 " + (r.hit_over15 ? "✓" : "✗"));
+      if (r.hit_over25 != null) bits.push("2,5 " + (r.hit_over25 ? "✓" : "✗"));
+      if (r.hit_btts != null) bits.push("AA " + (r.hit_btts ? "✓" : "✗"));
+      mid.appendChild(el("div","d", bits.join(" · ") + " · " + esc((r.sport && r.sport !== "soccer" ? (SPORTS[r.sport] || r.sport) + " · " : "") + lgName(r.league))));
+      it.appendChild(mid);
+      box.appendChild(it);
+    });
+    rb.appendChild(box);
+  }
+  async function loadBoard(){
+    if (!KEY) return;
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_board"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (!r.ok) return;
+      renderBoard(await r.json());
+    } catch(e) {}
+  }
+
+  var calcLegs = [], calcMatches = [];
+  function calcMarkets(f){
+    if (f.sport !== "soccer") return [["Gana " + f.home_team, +f.p_home], ["Gana " + f.away_team, +f.p_away]];
+    var m = [["Gana " + f.home_team, +f.p_home], ["Empate", +f.p_draw], ["Gana " + f.away_team, +f.p_away],
+      [f.home_team + " o empate", +f.p_home + +f.p_draw], [f.away_team + " o empate", +f.p_draw + +f.p_away]];
+    if (f.over15 != null) m.push(["Más de 1,5 goles", +f.over15]);
+    if (f.over25 != null) { m.push(["Más de 2,5 goles", +f.over25]); m.push(["Menos de 2,5 goles", 1 - f.over25]); }
+    if (f.over35 != null) m.push(["Menos de 3,5 goles", 1 - f.over35]);
+    if (f.btts != null) { m.push(["Ambos anotan: Sí", +f.btts]); m.push(["Ambos anotan: No", 1 - f.btts]); }
+    return m.filter(function(x){ return x[1] > 0 && x[1] < 1; });
+  }
+  function fillCalcMarkets(){
+    var f = calcMatches[+document.getElementById("cMatch").value], sel = document.getElementById("cMarket");
+    sel.innerHTML = "";
+    if (!f) return;
+    calcMarkets(f).forEach(function(m, i){ var o = document.createElement("option"); o.value = i; o.textContent = m[0] + " · " + pct(m[1]); sel.appendChild(o); });
+  }
+  function drawCalc(){
+    var box = document.getElementById("cLegs"), out = document.getElementById("cOut");
+    box.innerHTML = "";
+    calcLegs.forEach(function(l, i){
+      var it = el("div","res");
+      it.appendChild(el("div","mark-ok", pct(l.p)));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", "<b>" + esc(l.label) + "</b>"));
+      mid.appendChild(el("div","d", esc(l.match)));
+      it.appendChild(mid);
+      var rm = el("button","rm","×"); rm.type = "button"; rm.setAttribute("aria-label","Quitar");
+      rm.onclick = function(){ calcLegs.splice(i, 1); drawCalc(); };
+      it.appendChild(rm); box.appendChild(it);
+    });
+    if (!calcLegs.length) { out.innerHTML = "Agrega al menos una selección."; return; }
+    var p = calcLegs.reduce(function(a, l){ return a * l.p; }, 1), fair = 1 / p;
+    var odds = parseFloat(String(document.getElementById("cOdds").value).replace(",", "."));
+    var h = '<div class="big">' + pct(p) + '</div>Probabilidad real de que salga: <b>1 de cada ' + Math.max(1, Math.round(1 / p)) + '</b> veces · cuota justa <b>' + fair.toFixed(2).replace(".", ",") + '</b>';
+    if (odds > 1) {
+      var ev = p * odds - 1;
+      h += '<br>Con cuota <b>' + odds.toFixed(2).replace(".", ",") + '</b>: ' + (ev >= 0
+        ? '<b style="color:var(--win)">la casa paga bien</b> (a la larga +' + Math.round(ev * 100) + ' por cada 100 apostados)'
+        : '<b style="color:var(--loss)">la casa paga mal</b> (a la larga ' + Math.round(ev * 100) + ' por cada 100 apostados)');
+    }
+    if (calcLegs.length > 2) h += '<br>Cada selección que agregas multiplica el margen de la casa. Con 1 o 2 selecciones fuertes (85 %+) tienes más opciones.';
+    h += '<br><span style="font-size:12px">Supone que los partidos son independientes entre sí.</span>';
+    out.innerHTML = h;
+  }
+  function renderCalc(all){
+    var sec = document.getElementById("calc"); if (!sec) return;
+    sec.hidden = false;
+    var now = Date.now();
+    calcMatches = all.filter(function(f){ return Date.parse(f.commence_time) > now && f.p_home != null; })
+      .sort(function(a, b){ return Date.parse(a.commence_time) - Date.parse(b.commence_time); });
+    var sel = document.getElementById("cMatch"); sel.innerHTML = "";
+    calcMatches.forEach(function(f, i){ var o = document.createElement("option"); o.value = i;
+      o.textContent = f.home_team + " vs " + f.away_team + " · " + fmtDay(f.commence_time) + " " + fmtTime(f.commence_time); sel.appendChild(o); });
+    sel.onchange = fillCalcMarkets; fillCalcMarkets();
+    document.getElementById("cAdd").onclick = function(){
+      var f = calcMatches[+sel.value]; if (!f) return;
+      var key = f.home_team + "|" + f.away_team + "|" + f.commence_time;
+      if (calcLegs.some(function(l){ return l.key === key; })) { document.getElementById("cOut").innerHTML = "Ese partido ya está en la combinada (dos mercados del mismo partido no son independientes)."; return; }
+      var m = calcMarkets(f)[+document.getElementById("cMarket").value]; if (!m) return;
+      calcLegs.push({ key: key, label: m[0], p: m[1], match: f.home_team + " vs " + f.away_team + " · " + fmtDay(f.commence_time) });
+      drawCalc();
+    };
+    document.getElementById("cOdds").oninput = drawCalc;
+    document.getElementById("calcMeta").textContent = calcMatches.length + " partidos disponibles";
+    drawCalc();
+  }
+  function o2(v){ return (+v).toFixed(2).replace(".", ","); }
+  function bpSel(v){
+    var ln = v.line != null ? String(v.line).replace(".", ",") : "";
+    if (v.market === "1x2") return v.selection === "1" ? "Gana " + v.home : v.selection === "2" ? "Gana " + v.away : "Empate";
+    if (v.market === "totals") return (v.selection === "Over" ? "Más de " : "Menos de ") + ln + " goles";
+    if (v.market === "btts") return "Ambos anotan: " + (v.selection === "Yes" ? "Sí" : "No");
+    return v.selection;
+  }
+  function renderBp(d){
+    if (!d) return;
+    var sec = document.getElementById("bpval"), body = document.getElementById("bpvalBody");
+    sec.hidden = false; body.innerHTML = "";
+    var rc = d.record || {}, up = d.upcoming || [];
+    var meta = up.length + (up.length === 1 ? " señal abierta" : " señales abiertas");
+    if (+rc.n) meta += " · Cerradas " + rc.hits + "/" + rc.n + " · " + (+rc.profit >= 0 ? "+" : "") + String(rc.profit).replace(".", ",") + " u" + (rc.avg_close_edge != null ? " · vs línea final " + (+rc.avg_close_edge >= 0 ? "+" : "") + String(rc.avg_close_edge).replace(".", ",") + " %" : "");
+    document.getElementById("bpvalMeta").textContent = meta;
+    if (!up.length) { body.appendChild(el("div","state-box","Hoy no hay cuotas de BetPlay por encima del precio justo.")); return; }
+    var box = el("div","res-list");
+    up.forEach(function(v){
+      var it = el("div","res");
+      it.appendChild(el("div","mark-ok", "+" + Math.round(+v.edge * 100) + "%"));
+      var mid = el("div"); mid.style.minWidth = "0";
+      mid.appendChild(el("div","t", "<b>" + esc(bpSel(v)) + "</b> @ " + o2(+v.bp_price) + ' <span class="sc">justa ' + o2(1 / +v.pin_fair) + "</span>"));
+      var now = v.bp_now != null && +v.bp_now !== +v.bp_price ? " · ahora " + o2(+v.bp_now) + (v.edge_now != null ? " (" + (+v.edge_now >= 0 ? "+" : "") + Math.round(+v.edge_now * 100) + "%)" : "") : "";
+      mid.appendChild(el("div","d", esc(v.home) + " vs " + esc(v.away) + " · " + esc(fmtDay(v.kickoff)) + " " + fmtTime(v.kickoff) + now));
+      it.appendChild(mid); box.appendChild(it);
+    });
+    body.appendChild(box);
+  }
+  async function loadBp(){
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_bp_value"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (r.ok) renderBp(await r.json());
+    } catch(e) {}
+  }
+  async function loadMine(){
+    loadBoard(); if (KEY) loadBp();
+    if (!KEY) return;
+    try {
+      var r = await fetch(API.replace("public_free_dashboard", "owner_selection"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
+      if (!r.ok) return;
+      renderMine(await r.json());
+    } catch(e) {}
+  }
+
+  async function load(){
+    loadMine();
+    var d;
+    try {
+      var r = await fetch(API, { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: "{}" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      d = await r.json();
+    } catch(e) {
+      ["freeBody","fhBody","accBody","simBody"].forEach(function(id){ var x = document.getElementById(id); x.innerHTML = ""; x.appendChild(errBox()); });
+      return;
+    }
+    var f = d.free || {};
+    renderFree(f.picks || [], f.rec, f.hist);
+    renderFreeHistory(f.history || []);
+    renderPro(d.pro_record);
+    renderLive((d.pro_record || {}).live);
+    var sim = d.sim || {};
+    renderHistory(sim.sum || [], sim.leagues || [], f.hist);
+    document.getElementById("liveTxt").textContent = "Actualizado " + new Date().toLocaleTimeString("es-CO", { hour:"2-digit", minute:"2-digit" });
+  }
+  load();
+  setInterval(function(){ if (!document.hidden) load(); }, 5 * 60 * 1000);
+})();
+</script>
+<script>try{ if (window.Telegram && Telegram.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); } }catch(e){}</script>
 </body>
 </html>
