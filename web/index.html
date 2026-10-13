@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- version 2026-10-07b -->
+<!-- version 2026-10-12b -->
 <title>Kinetik Picks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
 <meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
@@ -199,6 +199,20 @@
   .chip{padding:7px 14px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); font-weight:600; font-size:13px; cursor:pointer; font-family:inherit}
   .chip b{font-family:var(--f-data); color:var(--ink-3); margin-left:4px}
   .chip.on{background:var(--ink); border-color:var(--ink); color:var(--bg)} .chip.on b{color:var(--bg)}
+  .chip.live{border-color:var(--loss)} .chip.live .dotl{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--loss); margin-right:6px; vertical-align:1px}
+  .chip.live.on{background:var(--loss); border-color:var(--loss); color:#fff} .chip.live.on .dotl{background:#fff} .chip.live.on b{color:#fff}
+  @media (prefers-reduced-motion: no-preference){ .chip.live .dotl{animation:blink 1.4s ease-in-out infinite} @keyframes blink{50%{opacity:.25}} }
+  .live-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px}
+  .lc{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; display:grid; gap:10px; min-width:0}
+  .lc-top{display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--ink-3)}
+  .lc-top .st{font-family:var(--f-data); font-weight:700; color:var(--loss)}
+  .lc-score{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:10px; align-items:center}
+  .lc-score .tm{font-weight:700; font-size:15px; line-height:1.2; min-width:0; overflow-wrap:anywhere}
+  .lc-score .tm.r{text-align:right}
+  .lc-score .sc{font-family:var(--f-data); font-weight:800; font-size:28px; letter-spacing:1px; white-space:nowrap}
+  .lc-pick{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:13px; color:var(--ink-2)}
+  .lc-pill{font-size:12px; font-weight:700; padding:4px 9px; border-radius:999px; background:var(--surface-2); color:var(--ink-2)}
+  .lc-pill.ok{background:var(--win-soft); color:var(--win)} .lc-pill.no{background:var(--loss-soft); color:var(--loss)} .lc-pill.mid{background:var(--mid-soft); color:var(--mid)}
 
   /* resultados */
   .res-list{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px}
@@ -240,6 +254,28 @@
   .quota.low{color:var(--loss); font-weight:600}
   .mark.logo{background:none; width:40px; height:40px; border-radius:10px; overflow:hidden}
   .mark.logo svg{width:40px; height:40px}
+  .adm{background:var(--surface); border:1px solid var(--gold); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:14px; margin-bottom:22px}
+  .adm-sum{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px}
+  .adm-sum div{background:var(--surface-2); border-radius:12px; padding:10px 12px}
+  .adm-sum b{display:block; font-family:var(--f-data); font-size:22px; color:var(--ink)}
+  .adm-sum span{font-size:12.5px; color:var(--ink-2)}
+  .adm h3{font-size:19px}
+  .adm-list{display:flex; flex-direction:column; gap:8px}
+  .adm-row{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; background:var(--surface-2); border-radius:12px; padding:10px 12px}
+  .adm-who{flex:1 1 200px; min-width:0}
+  .adm-who b{color:var(--ink)} .adm-who small{display:block; color:var(--ink-3); font-size:12px}
+  .adm-act{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+  .adm-act select,.adm-form input,.adm-form select{background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:7px 8px; font:inherit; font-size:13px; min-width:0}
+  .adm-act .chip,.adm-form .chip{padding:6px 12px; font-size:12.5px}
+  .chip.go{background:var(--win); border-color:var(--win); color:#fff}
+  .chip.warn{color:var(--loss); border-color:var(--loss)}
+  .adm-form{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .adm-form input[type=text]{flex:1 1 180px}
+  .adm-tag{font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px}
+  .adm-tag.on{background:var(--win-soft); color:var(--win)} .adm-tag.off{background:var(--loss-soft); color:var(--loss)} .adm-tag.soon{background:var(--mid-soft); color:var(--mid)}
+  .adm-msg{font-size:13px; background:var(--accent-soft); border-radius:10px; padding:10px 12px; color:var(--ink); word-break:break-all}
+  .adm-msg[hidden]{display:none}
+  .adm-empty{font-size:13.5px; color:var(--ink-3)}
 </style>
 <style>
   /* pagina publica: secciones extra */
@@ -277,6 +313,23 @@
 </header>
 
 <main class="wrap">
+  <section id="admin" class="adm" aria-labelledby="admTitle" hidden>
+    <div class="sec-head" style="margin:0"><h2 id="admTitle">Panel de administrador</h2><button type="button" class="chip" id="admRefresh">Actualizar</button></div>
+    <p class="lede" style="margin:0">Solo lo ves tú. Cuando alguien te pague, toca <b>Dar acceso</b>: el bot le manda por Telegram su enlace personal al Pro.</p>
+    <div class="adm-sum" id="admSum"></div>
+    <div class="adm-msg" id="admMsg" hidden></div>
+    <h3>Lista de espera <span class="meta" id="admWlN"></span></h3>
+    <div class="adm-list" id="admWait"></div>
+    <h3>Suscriptores</h3>
+    <div class="adm-list" id="admMembers"></div>
+    <h3>Agregar a alguien sin Telegram</h3>
+    <div class="adm-form">
+      <input type="text" id="admName" placeholder="Nombre" aria-label="Nombre">
+      <select id="admDays" aria-label="Días"><option value="30">30 días</option><option value="7">7 días</option><option value="90">90 días</option></select>
+      <select id="admPrice" aria-label="Precio"><option value="29900">$29.900</option><option value="19900">$19.900</option><option value="0">Gratis</option></select>
+      <button type="button" class="chip go" id="admAdd">Crear acceso</button>
+    </div>
+  </section>
   <section id="mine" class="band mine" aria-labelledby="mineTitle" hidden>
     <div class="band-head">
       <div>
@@ -618,6 +671,10 @@
     // filtro por deporte
     var counts = {}; all.forEach(function(f){ counts[f.sport] = (counts[f.sport] || 0) + 1; });
     var chips = el("div","chips");
+    var liveN = (d.live || []).length;
+    var lb = el("button", "chip live" + (boardSport === "live" ? " on" : ""), '<span class="dotl"></span>En vivo <b>' + liveN + '</b>');
+    lb.type = "button"; lb.onclick = function(){ boardSport = "live"; renderBoard(boardData); loadLive(); };
+    chips.appendChild(lb);
     [["all","Todos", all.length]].concat(Object.keys(SPORTS).filter(function(s){ return counts[s]; }).map(function(s){ return [s, SPORTS[s], counts[s]]; }))
       .forEach(function(c){
         var b = el("button", "chip" + (boardSport === c[0] ? " on" : ""), esc(c[1]) + " <b>" + c[2] + "</b>");
@@ -633,9 +690,14 @@
     var va = d.vs_apif;
     if (va && +va.n) rec.appendChild(el("div","conf-item", "Nosotros vs API-Football (ganador): <b>" + va.ours + "</b> vs <b>" + va.theirs + "</b> de " + va.n));
     body.appendChild(rec);
-    var up = boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
-    document.getElementById("boardMeta").textContent = up.length + " partidos";
-    if (!up.length) body.appendChild(el("div","state-box","No hay partidos próximos para este deporte."));
+    var up = boardSport === "live" ? [] : boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
+    if (boardSport === "live") {
+      document.getElementById("boardMeta").textContent = liveN + (liveN === 1 ? " partido en juego" : " partidos en juego");
+      var lbx = el("div"); lbx.id = "liveBox"; body.appendChild(lbx); renderLiveCards();
+    } else {
+      document.getElementById("boardMeta").textContent = up.length + " partidos";
+      if (!up.length) body.appendChild(el("div","state-box","No hay partidos próximos para este deporte."));
+    }
     var days = {}, order = [];
     up.forEach(function(f){ var k = fmtDay(f.commence_time); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
     order.forEach(function(k){
@@ -721,7 +783,8 @@
     try {
       var r = await fetch(API.replace("public_free_dashboard", "owner_board"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ p_key: KEY }) });
       if (!r.ok) return;
-      renderBoard(await r.json());
+      var bd = await r.json(); renderBoard(bd);
+      if (bd && bd.role === "owner") loadAdmin(); else document.getElementById("admin").hidden = true;
     } catch(e) {}
   }
 
@@ -792,6 +855,54 @@
     document.getElementById("calcMeta").textContent = calcMatches.length + " partidos disponibles";
     drawCalc();
   }
+  /* ---------- en vivo ---------- */
+  var liveScores = {}, liveTimer = null, liveAt = null;
+  function liveStatus(f, s){
+    // estado del pronostico con el marcador actual
+    var out = [];
+    if (!s || isNaN(s.h)) return out;
+    var d = s.h - s.a, fin = s.state === "post";
+    var lead = f.pick === "Local" ? d : f.pick === "Visitante" ? -d : null;
+    if (f.pick === "Empate") out.push(d === 0 ? ["ok", fin ? "✓ Empate" : "Va empatado"] : ["no", fin ? "✗ No hubo empate" : "No va empatado"]);
+    else if (lead != null) out.push(lead > 0 ? ["ok", fin ? "✓ Ganó" : "Va ganando"] : lead === 0 ? ["mid", fin ? "✗ Empató" : "Van empatados"] : ["no", fin ? "✗ Perdió" : "Va perdiendo"]);
+    if (f.sport === "soccer") {
+      if (f.dc_pick) { var dl = f.dc_pick === "1X" ? d : -d; out.push(dl >= 0 ? ["ok", "Doble oport. " + (fin ? "✓" : "va bien")] : ["no", "Doble oport. " + (fin ? "✗" : "va mal")]); }
+      if (f.over15 != null) { var tg = s.h + s.a; out.push(tg >= 2 ? ["ok", "+1,5 goles ✓"] : [fin ? "no" : "mid", fin ? "+1,5 goles ✗" : "+1,5 goles: faltan " + (2 - tg)]); }
+    }
+    return out;
+  }
+  function renderLiveCards(){
+    var box = document.getElementById("liveBox"); if (!box || !boardData) return;
+    box.innerHTML = "";
+    var L = boardData.live || [];
+    if (!L.length) { box.appendChild(el("div","state-box","No hay partidos de la parrilla jugándose en este momento.")); return; }
+    var g = el("div","live-grid");
+    L.forEach(function(f){
+      var s = liveScores[f.fixture_id], c = el("article","lc");
+      var stTxt = s ? (s.state === "post" ? "Terminó · calificando" : esc(s.detail || "En juego")) : (liveAt ? "En juego · sin marcador en vivo" : "Cargando…");
+      c.appendChild(el("div","lc-top", '<span>' + esc((f.sport !== "soccer" && (SPORTS[f.sport] || f.sport) !== lgName(f.league) ? (SPORTS[f.sport] || f.sport) + " · " : "") + lgName(f.league)) + " · " + fmtTime(f.commence_time) + '</span><span class="st">' + stTxt + '</span>'));
+      c.appendChild(el("div","lc-score", '<span class="tm">' + esc(f.home_team) + '</span><span class="sc">' + (s && !isNaN(s.h) ? s.h + " - " + s.a : "– : –") + '</span><span class="tm r">' + esc(f.away_team) + '</span>'));
+      var pk = el("div","lc-pick", "Pick: <b>" + esc(pickName(f.pick, f.home_team, f.away_team)) + "</b> " + pct(+f.pick_prob));
+      liveStatus(f, s).forEach(function(x){ pk.appendChild(el("span","lc-pill " + x[0], esc(x[1]))); });
+      c.appendChild(pk);
+      g.appendChild(c);
+    });
+    box.appendChild(g);
+    if (liveAt) box.appendChild(el("p","hint", "Marcadores de ESPN, se actualizan solos cada minuto · actualizado a las " + new Date(liveAt).toLocaleTimeString("es-CO", { hour:"2-digit", minute:"2-digit" })));
+  }
+  async function loadLive(){
+    clearTimeout(liveTimer);
+    if (boardSport !== "live" || !boardData) return;
+    var ids = (boardData.live || []).map(function(f){ return f.fixture_id; });
+    if (ids.length) {
+      try {
+        var r = await fetch(API.replace("/rest/v1/rpc/public_free_dashboard", "/functions/v1/live-scores"), { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify({ ids: ids }) });
+        if (r.ok) { var j = await r.json(); liveScores = j.scores || {}; liveAt = j.at || new Date().toISOString(); }
+      } catch(e) {}
+      renderLiveCards();
+    }
+    liveTimer = setTimeout(loadLive, 60000);
+  }
   function o2(v){ return (+v).toFixed(2).replace(".", ","); }
   function bpSel(v){
     var ln = v.line != null ? String(v.line).replace(".", ",") : "";
@@ -836,6 +947,91 @@
       renderMine(await r.json());
     } catch(e) {}
   }
+
+  /* ---------- panel de administrador (solo llave de dueño) ---------- */
+  var ADMIN = API.replace("/rest/v1/rpc/public_free_dashboard", "/functions/v1/pro-admin");
+  function money(n){ return "$" + Math.round(+n || 0).toLocaleString("es-CO"); }
+  function fdate(d){ return d ? d.slice(8,10) + "/" + d.slice(5,7) + "/" + d.slice(0,4) : "—"; }
+  async function admCall(body){
+    body.key = KEY;
+    var r = await fetch(ADMIN, { method: "POST", headers: { "apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    var j = {}; try { j = await r.json(); } catch(e) {}
+    if (!r.ok || !j.ok) throw new Error(j.error || ("Error " + r.status));
+    return j;
+  }
+  function admMsg(html){ var m = document.getElementById("admMsg"); m.innerHTML = html; m.hidden = !html; }
+  function admResult(j, what){
+    var t = j.telegram || {};
+    var h = "<b>" + esc(what) + "</b><br>";
+    h += t.sent ? "El bot le mandó su enlace por Telegram. " : "No se pudo mandar por Telegram" + (t.reason ? " (" + esc(t.reason) + ")" : "") + ": envíale tú este enlace. ";
+    if (j.link) h += '<br>Enlace personal: <span class="num">' + esc(j.link) + '</span> <button type="button" class="chip" id="admCopy">Copiar</button>';
+    admMsg(h);
+    var cb = document.getElementById("admCopy");
+    if (cb) cb.onclick = function(){ try { navigator.clipboard.writeText(j.link); cb.textContent = "Copiado"; } catch(e) {} };
+  }
+  async function admDo(btn, body, what, confirmTxt){
+    if (confirmTxt && !window.confirm(confirmTxt)) return;
+    var old = btn.textContent; btn.disabled = true; btn.textContent = "…";
+    try { var j = await admCall(body); if (body.action === "revoke") admMsg("<b>" + esc(what) + "</b>"); else admResult(j, what); await loadAdmin(); }
+    catch(e) { admMsg("No se pudo: " + esc(e.message)); }
+    btn.disabled = false; btn.textContent = old;
+  }
+  function planSelects(){
+    var d = el("select"); d.setAttribute("aria-label","Días"); d.innerHTML = '<option value="30">30 días</option><option value="7">7 días</option><option value="90">90 días</option>';
+    var p = el("select"); p.setAttribute("aria-label","Precio"); p.innerHTML = '<option value="29900">$29.900</option><option value="19900">$19.900</option><option value="0">Gratis</option>';
+    return [d, p];
+  }
+  function renderAdmin(j){
+    var sec = document.getElementById("admin"); sec.hidden = false;
+    var wl = j.waitlist || [], mem = j.members || [];
+    var act = mem.filter(function(m){ return m.active; });
+    var mrr = act.reduce(function(a, m){ return a + (+m.price || 0); }, 0);
+    var soon = act.filter(function(m){ return m.days_left != null && m.days_left <= 3; }).length;
+    document.getElementById("admSum").innerHTML =
+      '<div><b>' + act.length + '</b><span>suscriptores activos</span></div>' +
+      '<div><b>' + money(mrr) + '</b><span>ingreso mensual (según precio)</span></div>' +
+      '<div><b>' + wl.length + '</b><span>en lista de espera</span></div>' +
+      '<div><b>' + soon + '</b><span>vencen en 3 días o menos</span></div>';
+    document.getElementById("admWlN").textContent = wl.length ? "· " + wl.length : "";
+    var wb = document.getElementById("admWait"); wb.innerHTML = "";
+    if (!wl.length) wb.appendChild(el("div","adm-empty","Nadie en espera por ahora. Llegan cuando tocan «Quiero el Pro» en el canal."));
+    wl.forEach(function(w){
+      var row = el("div","adm-row");
+      var who = el("div","adm-who", "<b>" + esc(w.first_name || "Sin nombre") + "</b>" + (w.username ? " @" + esc(w.username) : "") +
+        "<small>Se anotó el " + fdate((w.joined_at || "").slice(0,10)) + (w.username ? ' · <a href="https://t.me/' + encodeURIComponent(w.username) + '" target="_blank" rel="noopener">escribirle</a>' : "") + "</small>");
+      var a = el("div","adm-act"), ps = planSelects();
+      var b = el("button","chip go","Dar acceso"); b.type = "button";
+      b.onclick = function(){ admDo(b, { action: "grant", tg_user_id: w.tg_user_id, days: +ps[0].value, price: +ps[1].value }, "Acceso dado a " + (w.first_name || "suscriptor") + " por " + ps[0].value + " días."); };
+      a.appendChild(ps[0]); a.appendChild(ps[1]); a.appendChild(b);
+      row.appendChild(who); row.appendChild(a); wb.appendChild(row);
+    });
+    var mb = document.getElementById("admMembers"); mb.innerHTML = "";
+    if (!mem.length) mb.appendChild(el("div","adm-empty","Todavía no hay suscriptores."));
+    mem.forEach(function(m){
+      var row = el("div","adm-row");
+      var tag = m.status === "revoked" ? '<span class="adm-tag off">Revocado</span>' : !m.active ? '<span class="adm-tag off">Vencido</span>' :
+        m.days_left <= 3 ? '<span class="adm-tag soon">Vence en ' + m.days_left + ' d</span>' : '<span class="adm-tag on">Activo · ' + m.days_left + ' d</span>';
+      var who = el("div","adm-who", "<b>" + esc(m.name || "Sin nombre") + "</b>" + (m.username ? " @" + esc(m.username) : "") + " " + tag +
+        "<small>Hasta el " + fdate(m.paid_until) + " · " + (m.price ? money(m.price) + "/mes" : "sin precio") + (m.tg_user_id ? " · Telegram" : " · sin Telegram") + "</small>");
+      var a = el("div","adm-act");
+      function btn(txt, cls, body, what, conf){ var b = el("button","chip" + (cls ? " " + cls : ""), txt); b.type = "button"; b.onclick = function(){ admDo(b, body, what, conf); }; a.appendChild(b); }
+      btn("Renovar +30", "go", { action: "grant", member_id: m.id, tg_user_id: m.tg_user_id || undefined, days: 30 }, "Renovado " + (m.name || "") + " por 30 días.");
+      btn("Reenviar enlace", "", { action: "resend", member_id: m.id }, "Enlace de " + (m.name || "") + ".");
+      btn("Nueva llave", "", { action: "newkey", member_id: m.id }, "Llave nueva para " + (m.name || "") + ". El enlace viejo ya no sirve.", "¿Cambiar la llave? El enlace anterior dejará de funcionar.");
+      if (m.status !== "revoked") btn("Revocar", "warn", { action: "revoke", member_id: m.id }, "Acceso revocado a " + (m.name || "") + ".", "¿Quitarle el acceso a " + (m.name || "este suscriptor") + " ahora?");
+      row.appendChild(who); row.appendChild(a); mb.appendChild(row);
+    });
+  }
+  async function loadAdmin(){
+    try { renderAdmin(await admCall({ action: "list" })); } catch(e) { document.getElementById("admin").hidden = true; }
+  }
+  document.getElementById("admRefresh").onclick = function(){ admMsg(""); loadAdmin(); };
+  document.getElementById("admAdd").onclick = function(){
+    var n = document.getElementById("admName").value.trim();
+    if (!n) { admMsg("Escribe el nombre primero."); return; }
+    admDo(this, { action: "grant", name: n, days: +document.getElementById("admDays").value, price: +document.getElementById("admPrice").value }, "Acceso creado para " + n + ".");
+    document.getElementById("admName").value = "";
+  };
 
   async function load(){
     loadMine();
