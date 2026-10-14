@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- version 2026-10-13a -->
+<!-- version 2026-10-13b -->
 <title>Kinetik Picks</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%3E%20%3Cdefs%3E%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%20%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2314305C%22/%3E%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%230A1830%22/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22url%28%23bg%29%22/%3E%20%3Cg%20transform%3D%22translate%2824%204%29%22%3E%20%3Cg%20stroke%3D%22%23E3B85A%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22214%22%20x2%3D%22140%22%20y2%3D%22214%22/%3E%20%3Cline%20x1%3D%2272%22%20y1%3D%22256%22%20x2%3D%22140%22%20y2%3D%22256%22/%3E%20%3Cline%20x1%3D%2292%22%20y1%3D%22298%22%20x2%3D%22140%22%20y2%3D%22298%22/%3E%20%3C/g%3E%20%3Crect%20x%3D%22168%22%20y%3D%22132%22%20width%3D%2256%22%20height%3D%22248%22%20rx%3D%2214%22%20fill%3D%22%23F2F5FA%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L340%20380%22%20stroke%3D%22%23F2F5FA%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M224%20262%20L318%20168%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2256%22%20stroke-linecap%3D%22round%22/%3E%20%3Cpath%20d%3D%22M276%20118%20L392%20118%20L392%20234%20Z%22%20fill%3D%22%233CCB8F%22%20stroke%3D%22%233CCB8F%22%20stroke-width%3D%2210%22%20stroke-linejoin%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E">
 <meta name="description" content="Pronósticos de fútbol con probabilidades reales, probados en más de 21.000 partidos y con cada acierto y fallo a la vista.">
@@ -276,6 +276,18 @@
   .adm-msg{font-size:13px; background:var(--accent-soft); border-radius:10px; padding:10px 12px; color:var(--ink); word-break:break-all}
   .adm-msg[hidden]{display:none}
   .adm-empty{font-size:13.5px; color:var(--ink-3)}
+  .conf-chips{align-items:center; margin-top:-4px}
+  .cc-l{font-size:12.5px; color:var(--ink-3); font-weight:600}
+  .chip.cf-alta.on{background:var(--win); border-color:var(--win); color:#fff}
+  .chip.cf-media.on{background:var(--mid); border-color:var(--mid); color:#fff}
+  .chip.cf-baja.on{background:var(--low); border-color:var(--low); color:#fff}
+  .cx{margin-top:10px; padding-top:8px; border-top:1px dashed var(--surface-2); display:flex; flex-direction:column; gap:6px}
+  .cx-row{display:grid; grid-template-columns:110px 1fr 1fr; gap:6px; align-items:center; font-size:12.5px}
+  @media (max-width:480px){ .cx-row{grid-template-columns:1fr 1fr} .cx-n{grid-column:1 / -1} }
+  .cx-n{color:var(--ink); font-weight:600}
+  .nodata{margin-top:8px; font-size:12px; color:var(--ink-3)} .cx-n small{display:block; color:var(--ink-3); font-weight:400}
+  .cx-o{background:var(--accent-soft); color:var(--ink-2); border-radius:8px; padding:4px 9px} .cx-o b{color:var(--ink)}
+  .cx-h{font-size:11.5px; color:var(--ink-3)}
 </style>
 <style>
   /* pagina publica: secciones extra */
@@ -661,7 +673,7 @@
   /* ---------- parrilla completa (solo con llave) ---------- */
   function pickName(p, h, a){ return p === "Local" ? h : p === "Visitante" ? a : "Empate"; }
   var SPORTS = { soccer:"Fútbol", tennis:"Tenis", football:"NFL", baseball:"MLB", basketball:"Baloncesto" };
-  var boardData = null, boardSport = "all";
+  var boardData = null, boardSport = "all", boardConf = "all";
   function renderBoard(d){
     var sec = document.getElementById("board");
     if (!d) { sec.hidden = true; return; }
@@ -682,6 +694,17 @@
         chips.appendChild(b);
       });
     body.appendChild(chips);
+    var cc = el("div","chips conf-chips");
+    cc.appendChild(el("span","cc-l","Probabilidad:"));
+    var pool = boardSport === "all" || boardSport === "live" ? all : all.filter(function(f){ return f.sport === boardSport; });
+    [["all","Todas"],["alta","Alta"],["media","Media"],["baja","Baja"]].forEach(function(c){
+      var n = c[0] === "all" ? pool.length : pool.filter(function(f){ return f.confidence === c[0]; }).length;
+      if (c[0] !== "all" && !n) return;
+      var b = el("button", "chip" + (c[0] !== "all" ? " cf-" + c[0] : "") + (boardConf === c[0] ? " on" : ""), esc(c[1]) + " <b>" + n + "</b>");
+      b.type = "button"; b.onclick = function(){ boardConf = c[0]; renderBoard(boardData); };
+      cc.appendChild(b);
+    });
+    if (boardSport !== "live") body.appendChild(cc);
     var rec = el("div","conf-row"); rec.style.margin = "0 0 14px";
     (d.bysport || []).forEach(function(s){
       if (!+s.n) return;
@@ -691,12 +714,13 @@
     if (va && +va.n) rec.appendChild(el("div","conf-item", "Nosotros vs API-Football (ganador): <b>" + va.ours + "</b> vs <b>" + va.theirs + "</b> de " + va.n));
     body.appendChild(rec);
     var up = boardSport === "live" ? [] : boardSport === "all" ? all : all.filter(function(f){ return f.sport === boardSport; });
+    if (boardConf !== "all") up = up.filter(function(f){ return f.confidence === boardConf; });
     if (boardSport === "live") {
       document.getElementById("boardMeta").textContent = liveN + (liveN === 1 ? " partido en juego" : " partidos en juego");
       var lbx = el("div"); lbx.id = "liveBox"; body.appendChild(lbx); renderLiveCards();
     } else {
       document.getElementById("boardMeta").textContent = up.length + " partidos";
-      if (!up.length) body.appendChild(el("div","state-box","No hay partidos próximos para este deporte."));
+      if (!up.length) body.appendChild(el("div","state-box", boardConf !== "all" ? "No hay partidos con probabilidad " + boardConf + " en este filtro." : "No hay partidos próximos para este deporte."));
     }
     var days = {}, order = [];
     up.forEach(function(f){ var k = fmtDay(f.commence_time); if (!days[k]) { days[k] = []; order.push(k); } days[k].push(f); });
@@ -729,10 +753,20 @@
         if (f.over35 != null) parts.push('<span>-3,5 goles <b>' + pct(1 - f.over35) + '</b></span>');
         if (f.btts != null) parts.push('<span>Ambos anotan <b>' + pct(+f.btts) + '</b></span>');
         if (f.top_home != null) parts.push('<span>Marcador <b>' + f.top_home + '-' + f.top_away + '</b></span>');
-        if (f.corners_exp != null) parts.push('<span>Córners ~<b>' + dec(f.corners_exp) + '</b></span>');
-        if (f.cards_exp != null) parts.push('<span>Tarjetas ~<b>' + dec(f.cards_exp) + '</b></span>');
         mk.innerHTML = parts.join("");
         c.appendChild(mk);
+        var cx = [];
+        function lines(exp, name, po, pu){
+          var b = Math.floor(+exp), lo = Math.max(0.5, b - 1.5), hi = b + 2.5;
+          return '<div class="cx-row"><span class="cx-n">' + name + ' <small>esperados ' + dec(exp) + '</small></span>' +
+            '<span class="cx-o">Más de <b>' + dec(lo) + '</b> · ' + po + '</span>' +
+            '<span class="cx-o">Menos de <b>' + dec(hi) + '</b> · ' + pu + '</span></div>';
+        }
+        if (f.corners_exp != null) cx.push(lines(f.corners_exp, "Córners", "71 %", "73 %"));
+        if (f.cards_exp != null) cx.push(lines(f.cards_exp, "Tarjetas", "81 %", "83 %"));
+        if (f.sport === "soccer" && f.over15 == null && f.corners_exp == null) c.appendChild(el("div","nodata","Goles, córners y tarjetas: sin historial suficiente entre estos equipos (pasa en copas internacionales y ligas nuevas en el sistema)."));
+        else if (f.sport === "soccer" && f.corners_exp == null) c.appendChild(el("div","nodata","Córners y tarjetas: esta liga no publica esas estadísticas."));
+        if (cx.length) c.appendChild(el("div","cx", cx.join("") + '<div class="cx-h">Apuesta a una de las dos líneas, no a ambas. % = cuántas veces se cumplió en 12.900 partidos analizados.</div>'));
         if (f.apif) {
           var ax = [], A = f.apif;
           if (A.lineups && A.lineups.length) ax.push("Alineaciones confirmadas: <b>" + A.lineups.map(function(t){ return esc(t.formation || "?"); }).join(" vs ") + "</b>");
